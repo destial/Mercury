@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <relativePath>../pom.xml</relativePath>
+        <version>1.0.1</version>
+        <groupId>tc.oc.pgm</groupId>
+        <artifactId>PGM</artifactId>
+    </parent>
+
+    <name>Util</name>
+    <artifactId>util</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Various utility classes for Bukkit -->
+        <dependency>
+            <groupId>tc.oc.pgm</groupId>
+            <artifactId>core</artifactId>
+            <version>0.9-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/i18n/templates</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <!-- <resource>
+                <directory>src/main/i18n/translations</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource> -->
+        </resources>
+    </build>
+</project>

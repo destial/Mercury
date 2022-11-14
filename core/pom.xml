@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <properties>
+        <project.mainClass>tc.oc.pgm.PGMPlugin</project.mainClass>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <parent>
+        <relativePath>../pom.xml</relativePath>
+        <version>1.0.1</version>
+        <groupId>tc.oc.pgm</groupId>
+        <artifactId>PGM</artifactId>
+    </parent>
+
+    <name>Core</name>
+    <artifactId>core</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Various utility classes for Bukkit -->
+        <dependency>
+            <groupId>tc.oc.pgm</groupId>
+            <artifactId>util</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>Mercury-${project.version}</finalName>
+        <resources>
+            <!-- Include the required plugin.yml and config.yml for Bukkit -->
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>true</minimizeJar>
+                    <artifactSet>
+                        <includes>
+                            <include>tc.oc.pgm:*:*</include>
+                            <include>xyz.destiall.java:*:*</include>
+                            <include>org.jdom:jdom2:*</include>
+                            <include>net.kyori:text-*:*</include>
+                            <include>org.json:*:*</include>
+                            <include>app.ashcon.intake:intake-*:*</include>
+                            <include>org.eclipse.jgit:org.eclipse.jgit:*</include>
+                            <include>org.slf4j:slf4j-api:*</include>
+                        </includes>
+                    </artifactSet>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <relocations combine.children="append">
+                        <relocation>
+                            <pattern>app.ashcon.intake</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.app.ashcon.intake</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.net.kyori</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jdom2</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.org.jdom2</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.json</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.org.json</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.eclipse.jgit</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.org.eclipse.jgit</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.slf4j</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.org.slf4j</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>xyz.destiall</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.xyz.destiall</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>jar</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${basedir}/target/${project.build.finalName}.jar"
+                                      tofile="../target/Mercury.jar"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

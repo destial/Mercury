@@ -1,0 +1,11 @@
+enabled: true
+random: false
+interval: 30
+broadcasts:
+  - "&3[&9&lTIP&3] &9Check out the map rotation using /rotation or /rot!"
+  - "&3[&9&lTIP&3] &9Join the game by typing /join!"
+  - "&3[&9&lTIP&3] &9Check out the current map information by using /map!"
+  - "&3[&9&lTIP&3] &9Toggle between team and global chats via /t and /g!"
+  - "&3[&9&lTIP&3] &9Report a player by using /report!"
+  - "&3[&9&lTIP&3] &9You can toggle blood effects using /toggle blood!"
+  - "&3[&9&lTIP&3] &9View the match information using /match!"

@@ -1,0 +1,470 @@
+package tc.oc.pgm.api;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
+import net.kyori.text.Component;
+import net.kyori.text.TextComponent;
+import net.kyori.text.TranslatableComponent;
+import net.kyori.text.event.ClickEvent;
+import net.kyori.text.event.HoverEvent;
+import net.kyori.text.format.TextColor;
+import net.kyori.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.permissions.Permission;
+import tc.oc.pgm.api.map.factory.MapSourceFactory;
+import tc.oc.pgm.elo.EloConfig;
+
+/** A configuration for server owners to modify {@link PGM}. */
+public interface Config {
+
+  Duration getDefaultRespawnDelay();
+
+  /**
+   * Gets the log level to set in console.
+   *
+   * @return A log level, info is recommended.
+   */
+  Level getLogLevel();
+
+  /**
+   * Gets a resource identifier for a database.
+   *
+   * <p>eg. sqlite3://path/to/pgm.db, mysql://localhost?ssl=false
+   *
+   * @return A database uri, or null to use an in-memory database.
+   */
+  @Nullable
+  String getDatabaseUri();
+
+  /**
+   * Gets the maximum number of concurrent database connections.
+   *
+   * @return Number of connections.
+   */
+  int getDatabaseMaxConnections();
+
+  /**
+   * Gets a list of map source factories
+   *
+   * @return A list of map source factories.
+   */
+  List<? extends MapSourceFactory> getMapSourceFactories();
+
+  /**
+   * Gets a path to "map-pool.yml" file.
+   *
+   * @return A path to a map pool, or null for no map pools.
+   */
+  @Nullable
+  String getMapPoolFile();
+
+  /**
+   * Gets a path to the "broadcasts.yml" file.
+   *
+   * @return A path to the broadcasts file, or null for no broadcasts
+   */
+  @Nullable
+  String getBroadcastFile();
+
+  /**
+   * Gets a duration to wait before starting a match.
+   *
+   * @return A duration, if non-positive then starts immediately.
+   */
+  Duration getStartTime();
+
+  /**
+   * Gets a duration to give teams to "strategize" before the match starts.
+   *
+   * @return A duration, if non-positive or null then skips this phase.
+   */
+  Duration getHuddleTime();
+
+  /**
+   * Gets a duration to wait before cycling to another match.
+   *
+   * @return A duration, if zero then cycles immediately, if negative does not auto-cycle.
+   */
+  Duration getCycleTime();
+
+  /**
+   * Gets a duration to wait before the server should restart.
+   *
+   * @return A duration, disabled if non-positive.
+   */
+  Duration getUptimeLimit();
+
+  /**
+   * Gets the maximum number of matches before the server should restart.
+   *
+   * @return A maximum number of matches, disabled if non-positive.
+   */
+  long getMatchLimit();
+
+  /**
+   * Gets the minimum number of players for a match to start.
+   *
+   * @return A minimum number of players, disabled if non-positive.
+   */
+  long getMinimumPlayers();
+
+  /**
+   * Gets whether observers can join a match after it has started.
+   *
+   * <p>Blitz matches are exempt from this rule, you can never join during a blitz match.
+   *
+   * @return If observers can join during a match.
+   */
+  boolean canAnytimeJoin();
+
+  /**
+   * Gets whether map limits on team sizes should be enforced.
+   *
+   * @return If size limits are enforced.
+   */
+  boolean shouldLimitJoin();
+
+  /**
+   * Gets whether teams should, on a best-case basis, try to be rebalanced.
+   *
+   * @return If team re-balancing is enabled.
+   */
+  boolean shouldBalanceJoin();
+
+  /**
+   * Gets whether teams are required to be balanced, using a queue system.
+   *
+   * @return If teams are required to be balanced.
+   */
+  boolean shouldQueueJoin();
+
+  /**
+   * Gets whether non-premium players can be kicked to make room for a premium player.
+   *
+   * @return If priority kick is enabled.
+   */
+  boolean canPriorityKick();
+
+  /**
+   * Gets whether teams are required to be balanced, using the elo system
+   *
+   * @return If teams are required to be balanced.
+   */
+  boolean shouldQueueElo();
+
+  /**
+   * Gets whether proximity metrics are visible to players.
+   *
+   * @return If proximity is visible.
+   */
+  boolean showProximity();
+
+  /**
+   * Gets whether the side bar is rendered.
+   *
+   * @return If the side bar is rendered.
+   */
+  boolean showSideBar();
+
+  /**
+   * Gets a header for the side bar.
+   *
+   * @return The side bar header, or null to defer to the map's title.
+   */
+  @Nullable
+  Component getMatchHeader();
+
+  /**
+   * Gets a footer for the side bar.
+   *
+   * @return The side bar footer, or null for none.
+   */
+  @Nullable
+  Component getMatchFooter();
+
+  /**
+   * Gets the left side text for the Tablist.
+   *
+   * @return The left side component, or null for none.
+   */
+  @Nullable
+  Component getLeftTablistText();
+
+  /**
+   * Gets the right side text for the Tablist.
+   *
+   * @return The right side component, or null for none.
+   */
+  @Nullable
+  Component getRightTablistText();
+
+  /**
+   * Gets whether the tab list is rendered.
+   *
+   * @return If the tab list is rendered.
+   */
+  boolean showTabList();
+
+  /**
+   * Gets whether the tab list is should show real ping.
+   *
+   * @return If the tab list should show real ping.
+   */
+  boolean showTabListPing();
+
+  /**
+   * Gets whether observers are shown to participants in the tab list.
+   *
+   * @return If observers should be visible to participants.
+   */
+  boolean canParticipantsSeeObservers();
+
+  /**
+   * Gets whether to show fireworks when an objective is completed or when the match ends.
+   *
+   * @return If fireworks should be shown.
+   */
+  boolean showFireworks();
+
+  /**
+   * Whether the wool flag beams created for older versions (pre-1.8) should be shown to all
+   * players.
+   *
+   * @return If the wool flag beams should be shown to players >=1.8
+   */
+  boolean useLegacyFlagBeams();
+
+  /**
+   * Gets a format to override the server's "message of the day."
+   *
+   * <p>{0} = The existing MoTD.
+   *
+   * <p>{1} = Name of the map currently playing.
+   *
+   * <p>{2} = A color code representing the current match state.
+   *
+   * @return A motd format, or null to leave unmodified.
+   */
+  @Nullable
+  String getMotd();
+
+  /**
+   * Gets the global chat format
+   *
+   * <p>{0} = The player's name + prefix
+   *
+   * <p>{1} = The message
+   *
+   * @return
+   */
+  String getGlobalFormat();
+
+  /**
+   * Gets the tean chat format (including admin chat)
+   *
+   * <p>{0} = The player's name + prefix
+   *
+   * <p>{1} = The message
+   *
+   * @return
+   */
+  String getTeamFormat();
+
+  /**
+   * Gets whether wool in capture the wool maps are auto refilled.
+   *
+   * @return If wool auto refill is enabled.
+   */
+  boolean shouldRefillWool();
+
+  /**
+   * Gets whether objective touch messages should be shown.
+   *
+   * @return
+   */
+  boolean showTouch();
+
+  /**
+   * Gets at which score players should be no longer allowed to keep playing TDM
+   *
+   * @return The minimum score they must hold
+   */
+  int getGriefScore();
+
+  /**
+   * Gets a group of players, used for prefixes and player sorting.
+   *
+   * @return A list of groups.
+   */
+  List<Config.Group> getGroups();
+
+  /**
+   * Gets the elo config provided
+   *
+   * @return The {@link EloConfig}
+   */
+  EloConfig getEloConfig();
+
+  /** Reload the {@link EloConfig} */
+  void reloadEloConfig();
+
+  /**
+   * Gets the sussy client names
+   *
+   * @return Sus
+   */
+  List<String> getSussyClients();
+
+  /** A group of players with a common permission set and optional prefix. */
+  interface Group {
+
+    /**
+     * Gets a unique id for the group.
+     *
+     * @return A group id.
+     */
+    String getId();
+
+    /**
+     * Gets a flair object which holds all prefix/suffix related data
+     *
+     * @return A {@link Flair} for this group
+     */
+    Flair getFlair();
+
+    /**
+     * Gets the prefix to show next to each player's name.
+     *
+     * @return A chat prefix, or null for none.
+     */
+    @Nullable
+    default String getPrefix() {
+      return getFlair().getPrefix();
+    }
+
+    /**
+     * Gets the suffix to show next to each player's name.
+     *
+     * @return A chat suffix, or null for none.
+     */
+    @Nullable
+    default String getSuffix() {
+      return getFlair().getSuffix();
+    }
+
+    /**
+     * Gets the message color of the player according to group
+     *
+     * @return The message color e.g. "&c"
+     */
+    @Nullable
+    default String getMessageColor() {
+      return getFlair().getMessageColor();
+    }
+
+    @Nullable
+    default ChatColor getMessageChatColor() {
+      String color = getMessageColor();
+      if (color == null) return ChatColor.RESET;
+      return ChatColor.getByChar(color.charAt(1));
+    }
+
+    /**
+     * Gets the permission node required to be included in this group.
+     *
+     * @return A permission node, or "op" for server operator.
+     */
+    Permission getPermission();
+
+    /**
+     * Gets a map of permissions applied when players are in observers.
+     *
+     * @return A permissions map.
+     */
+    Permission getObserverPermission();
+
+    /**
+     * Gets a map of permissions applied when players are participating.
+     *
+     * @return A permissions map.
+     */
+    Permission getParticipantPermission();
+  }
+
+  interface Flair {
+
+    String getPrefix();
+
+    String getSuffix();
+
+    String getDescription();
+
+    String getDisplayName();
+
+    String getClickLink();
+
+    String getMessageColor();
+
+    Component getPrefixOverride();
+
+    Component getSuffixOverride();
+
+    default Component getComponent(boolean prefix) {
+      if (prefix ? getPrefixOverride() != null : getSuffixOverride() != null) {
+        return prefix ? getPrefixOverride() : getSuffixOverride();
+      }
+      TextComponent.Builder hover = TextComponent.builder();
+      boolean addNewline = false;
+      if (getDisplayName() != null && !getDisplayName().isEmpty()) {
+        addNewline = true;
+        hover.append(getDisplayName());
+      }
+      if (getDescription() != null && !getDescription().isEmpty()) {
+        if (addNewline) hover.append(TextComponent.newline());
+        addNewline = true;
+        hover.append(getDescription());
+      }
+
+      if (getClickLink() != null && !getClickLink().isEmpty()) {
+        if (addNewline) hover.append(TextComponent.newline());
+
+        Component clickLink =
+            TranslatableComponent.of(
+                "chat.clickLink",
+                TextColor.DARK_AQUA,
+                TextComponent.of(getClickLink(), TextColor.AQUA, TextDecoration.UNDERLINED));
+        hover.append(clickLink);
+      }
+
+      TextComponent.Builder component =
+          TextComponent.builder()
+              .append(prefix ? getPrefix() : getSuffix())
+              .hoverEvent(HoverEvent.showText(hover.build()));
+
+      if (getClickLink() != null && !getClickLink().isEmpty()) {
+        component.clickEvent(ClickEvent.openUrl(getClickLink()));
+      }
+
+      return component.build();
+    }
+  }
+
+  /**
+   * Gets whether "community mode" should be installed if not present.
+   *
+   * <p>Includes features such as /report, /warn, /freeze, and more.
+   *
+   * @return If community mode is enabled.
+   */
+  boolean isCommunityMode();
+
+  /**
+   * Gets experimental configuration settings that are not yet stable.
+   *
+   * @return A map of experimental settings.
+   */
+  Map<String, Object> getExperiments();
+}

@@ -82,10 +82,12 @@ public final class CoinCommand implements Listener {
       sender.sendWarning(TextComponent.of("Coins are currently disabled!"));
       return;
     }
-    if (sender.getCoins().getCoins() < 10000) {
+    if (sender.getCoins().getCoins() < PGM.get().getShop().getBuyMapCost()) {
       sender.sendWarning(
           TextComponent.of(
-              "You do not have enough coins! 10,000 coins is needed to buy a map cycle!",
+              "You do not have enough coins! "
+                  + PGM.get().getShop().getBuyMapCost()
+                  + " coins is needed to buy a map cycle!",
               TextColor.RED));
       return;
     }
@@ -102,7 +104,7 @@ public final class CoinCommand implements Listener {
       return;
     }
 
-    sender.getCoins().removeCoins(10000);
+    sender.getCoins().removeCoins(PGM.get().getShop().getBuyMapCost());
     mapOrder.setNextMap(map);
     sender.sendMessage(
         TextComponent.of("You have set the next map to be: " + map.getName(), TextColor.GREEN));
@@ -130,10 +132,12 @@ public final class CoinCommand implements Listener {
       sender.sendWarning(TranslatableComponent.of("admin.start.matchFinished"));
       return;
     }
-    if (sender.getCoins().getCoins() < 10000) {
+    if (sender.getCoins().getCoins() < PGM.get().getShop().getBuySkipCost()) {
       sender.sendWarning(
           TextComponent.of(
-              "You do not have enough coins! 10,000 coins is needed to buy a map skip!"));
+              "You do not have enough coins! "
+                  + PGM.get().getShop().getBuySkipCost()
+                  + " coins is needed to buy a map skip!"));
       return;
     }
     if (mapOrder.getNextMap() != null) {
@@ -149,7 +153,7 @@ public final class CoinCommand implements Listener {
       return;
     }
 
-    sender.getCoins().removeCoins(10000);
+    sender.getCoins().removeCoins(PGM.get().getShop().getBuySkipCost());
     if (mapOrder.getNextMap() != match.getMap()) {
       mapOrder.setNextMap(mapOrder.getNextMap());
     }
@@ -177,10 +181,12 @@ public final class CoinCommand implements Listener {
       return;
     }
 
-    if (sender.getCoins().getCoins() < 5000) {
+    if (sender.getCoins().getCoins() < PGM.get().getShop().getBuyStartCost()) {
       sender.sendWarning(
           TextComponent.of(
-              "You do not have enough coins! 5,000 coins is needed to buy an instant start!"));
+              "You do not have enough coins! "
+                  + PGM.get().getShop().getBuyStartCost()
+                  + " coins is needed to buy an instant start!"));
       return;
     }
 
@@ -192,7 +198,7 @@ public final class CoinCommand implements Listener {
       }
       return;
     }
-    sender.getCoins().removeCoins(5000);
+    sender.getCoins().removeCoins(PGM.get().getShop().getBuyStartCost());
     sender.sendMessage(TextComponent.of("You have started this match!", TextColor.GREEN));
     match.sendMessage(
         TextComponent.of(

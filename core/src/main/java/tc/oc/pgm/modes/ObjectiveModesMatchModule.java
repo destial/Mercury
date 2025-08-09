@@ -16,7 +16,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
+import tc.oc.pgm.api.match.event.MatchLoadEvent;
 import tc.oc.pgm.countdowns.CountdownContext;
+import tc.oc.pgm.filters.FilterMatchModule;
 import tc.oc.pgm.util.LegacyFormatUtils;
 import tc.oc.pgm.util.chat.Sound;
 
@@ -37,17 +39,33 @@ public class ObjectiveModesMatchModule implements MatchModule, Listener {
   }
 
   @Override
-  public void load() {
+  public void load() {}
+
+  @EventHandler
+  public void onMatchLoad(MatchLoadEvent e) {
+    FilterMatchModule fmm = match.needModule(FilterMatchModule.class);
     for (Mode mode : this.modes) {
       ModeChangeCountdown countdown = new ModeChangeCountdown(match, this, mode);
-      this.countdowns.add(countdown);
+      if (mode.getFilter() != null) {
+        fmm.listen(
+            mode.getFilter(),
+            (filter, query, oldResponse, newResponse) -> {
+              if (newResponse.isAllowed()) {
+                if (!this.countdownContext.isRunning(countdown) && match.isRunning()) {
+                  this.countdownContext.start(countdown, countdown.getMode().getAfter());
+                }
+              }
+            });
+      }
     }
   }
 
   @Override
   public void enable() {
     for (ModeChangeCountdown countdown : this.countdowns) {
-      this.countdownContext.start(countdown, countdown.getMode().getAfter());
+      if (countdown.getMode().getFilter() == null) {
+        this.countdownContext.start(countdown, countdown.getMode().getAfter());
+      }
     }
   }
 
@@ -93,6 +111,10 @@ public class ObjectiveModesMatchModule implements MatchModule, Listener {
     Collections.sort(activeCountdowns);
 
     return activeCountdowns;
+  }
+
+  public ModeChangeCountdown getCountdown(Mode mode) {
+    return this.countdowns.stream().filter(mcc -> mcc.getMode() == mode).findFirst().orElse(null);
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -71,7 +72,7 @@ public abstract class FilterParser {
   }
 
   public List<Element> getFilterChildren(Element parent) {
-    List<Element> elements = new ArrayList<Element>();
+    List<Element> elements = new ArrayList<>();
     for (Element el : parent.getChildren()) {
       if (this.isFilter(el)) {
         elements.add(el);
@@ -442,5 +443,10 @@ public abstract class FilterParser {
   @MethodParser("time")
   public TimeFilter parseTimeFilter(Element el) throws InvalidXMLException {
     return new TimeFilter(XMLUtils.parseDuration(el, null));
+  }
+
+  @MethodParser("completed")
+  public Filter parseCompleted(Element el) throws InvalidXMLException {
+    return new TeamFilterAdapter(Optional.empty(), parseGoal(el));
   }
 }

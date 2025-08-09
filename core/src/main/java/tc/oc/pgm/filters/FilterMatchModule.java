@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,7 +17,10 @@ import tc.oc.pgm.api.filter.query.MatchQuery;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
 import tc.oc.pgm.api.match.MatchScope;
+import tc.oc.pgm.api.match.event.MatchLoadEvent;
+import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 import tc.oc.pgm.events.ListenerScope;
+import tc.oc.pgm.events.PlayerPartyChangeEvent;
 import tc.oc.pgm.flag.event.FlagStateChangeEvent;
 import tc.oc.pgm.goals.events.GoalCompleteEvent;
 import tc.oc.pgm.util.TimeUtils;
@@ -42,43 +46,43 @@ public class FilterMatchModule implements MatchModule, Listener {
   public void listen(Filter filter, FilterListener listener) {
     listeners.put(filter, listener);
 
-    Filter.QueryResponse response = responses.get(filter);
-    if (response == null) {
-      response = filter.query(match.getQuery());
-      responses.put(filter, response);
-    }
+    Filter.QueryResponse oldResponse = responses.get(filter);
+    Filter.QueryResponse newResponse = filter.query(match.getQuery());
+    responses.put(filter, newResponse);
+    listener.filterQueryChanged(filter, match.getQuery(), oldResponse, newResponse);
+  }
 
-    listener.filterQueryChanged(filter, match.getQuery(), null, response);
+  @EventHandler
+  public void onMatchLoad(MatchLoadEvent event) {
+    checkAll(event);
   }
 
   @Override
-  public void load() {
-    // FIXME: PGM no longer has access to MapFactory at Match time
-    /*for (TimeFilter filter :
-        match.getMap().getFeatures().getAll(TimeFilter.class)) {
-      timeFilterQueue.add(filter);
-    }*/
-  }
+  public void load() {}
 
   @Override
   public void enable() {
     checkTimeFilters();
   }
 
-  void check(Filter filter) {
-    Filter.QueryResponse newResponse = filter.query(match.getQuery());
-    Filter.QueryResponse oldResponse = responses.put(filter, newResponse);
+  void check(Filter filter, Event event) {
+    if (event == null
+        || !filter.isDynamic()
+        || filter.getRelevantEvents().contains(event.getClass())) {
+      Filter.QueryResponse newResponse = filter.query(match.getQuery());
+      Filter.QueryResponse oldResponse = responses.put(filter, newResponse);
 
-    if (oldResponse != newResponse) {
-      for (FilterListener listener : listeners.get(filter)) {
-        listener.filterQueryChanged(filter, match.getQuery(), oldResponse, newResponse);
+      if (oldResponse != newResponse) {
+        for (FilterListener listener : listeners.get(filter)) {
+          listener.filterQueryChanged(filter, match.getQuery(), oldResponse, newResponse);
+        }
       }
     }
   }
 
-  void checkAll() {
+  void checkAll(Event event) {
     for (Filter filter : listeners.keySet()) {
-      check(filter);
+      check(filter, event);
     }
   }
 
@@ -95,7 +99,7 @@ public class FilterMatchModule implements MatchModule, Listener {
       removed = true;
     }
 
-    if (removed) checkAll();
+    if (removed) checkAll(null);
 
     if (next != null) {
       match
@@ -107,11 +111,21 @@ public class FilterMatchModule implements MatchModule, Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onGoalComplete(GoalCompleteEvent event) {
-    checkAll();
+    checkAll(event);
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onPlayerDeath(MatchPlayerDeathEvent event) {
+    checkAll(event);
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onPlayerPartyChange(PlayerPartyChangeEvent event) {
+    checkAll(event);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onFlagChange(FlagStateChangeEvent event) {
-    checkAll();
+    checkAll(event);
   }
 }

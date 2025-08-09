@@ -1,11 +1,11 @@
 package tc.oc.pgm.util.bukkit;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
+import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
+import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import org.bukkit.entity.Player;
 import tc.oc.pgm.util.nms.NMSHacks;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossStyle;
 
 public class ViaUtils {
   /** Minecraft 1.7.6 &ndash; 1.7.10 */
@@ -20,7 +20,8 @@ public class ViaUtils {
   static {
     boolean viaLoaded = false;
     try {
-      viaLoaded = Class.forName("us.myles.ViaVersion.api.Via") != null;
+      Class.forName("vom.viaversion.viaversion.api.Via");
+      viaLoaded = true;
     } catch (ClassNotFoundException ignored) {
     }
     ENABLED = viaLoaded;
@@ -46,7 +47,9 @@ public class ViaUtils {
     return !enabled() || Via.getAPI().isInjected(player.getUniqueId());
   }
 
-  public static BossBar<?> createBossBar() {
-    return enabled() ? Via.getAPI().createBossBar("", BossColor.BLUE, BossStyle.SOLID) : null;
+  public static BossBar createBossBar() {
+    return enabled()
+        ? Via.getAPI().legacyAPI().createLegacyBossBar("", BossColor.BLUE, BossStyle.SOLID)
+        : null;
   }
 }

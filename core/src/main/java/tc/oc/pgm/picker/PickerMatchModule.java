@@ -219,7 +219,7 @@ public class PickerMatchModule implements MatchModule, Listener {
     if (hasTeams) {
       JSONObject data = player.getPlayerData().getData();
       int left = data.has("team_selections") ? data.getInt("team_selections") : 0;
-      title += ChatColor.DARK_BLUE + "(" + left + ")";
+      title += ChatColor.DARK_BLUE + " (" + left + " free)";
     }
 
     return title;
@@ -563,17 +563,15 @@ public class PickerMatchModule implements MatchModule, Listener {
     // Pad last row to width
     while (slots.size() % WIDTH != 0) slots.add(null);
 
-    if (hasJoined(player)) {
-      // Put leave button in first empty slot of the last column
-      for (int slot = WIDTH - 1; ; slot += WIDTH) {
-        while (slots.size() <= slot) {
-          slots.add(null);
-        }
+    // Put leave button in first empty slot of the last column
+    for (int slot = WIDTH - 1; ; slot += WIDTH) {
+      while (slots.size() <= slot) {
+        slots.add(null);
+      }
 
-        if (slots.get(slot) == null) {
-          slots.set(slot, createLeaveButton(player));
-          break;
-        }
+      if (slots.get(slot) == null) {
+        slots.set(slot, createLeaveButton(player));
+        break;
       }
     }
 
@@ -765,8 +763,6 @@ public class PickerMatchModule implements MatchModule, Listener {
   }
 
   private void scheduleLeave(final MatchPlayer player) {
-    if (!hasJoined(player)) return;
-
     final Player bukkit = player.getBukkit();
     match
         .getExecutor(MatchScope.LOADED)

@@ -20,6 +20,8 @@ public interface PGM extends Plugin {
 
   Config getConfiguration();
 
+  Shop getShop();
+
   Logger getGameLogger();
 
   Datastore getDatastore();

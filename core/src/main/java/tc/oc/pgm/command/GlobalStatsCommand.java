@@ -111,6 +111,12 @@ public final class GlobalStatsCommand {
       case ELO:
         tag = "Top Elo";
         break;
+      case SCORE:
+        tag = "Top Combat Score";
+        break;
+      case ARROWS:
+        tag = "Top Arrows Hit";
+        break;
       default:
         break;
     }

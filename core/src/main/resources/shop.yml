@@ -1,0 +1,23 @@
+# Cost of buying a map cycle
+buy-map: 10000
+
+# Cost of buying a skip of the current map
+buy-skip: 10000
+
+# Cost of instantly starting the current map
+buy-start: 5000
+
+# Max number of coins to receive when getting a kill
+kill-coins-max: 10
+
+# Min number of coins to receive when getting a kill
+kill-coins-min: 1
+
+# Max number of coins to receive when completing an objective
+objective-coins-max: 50
+
+# Min number of coins to receive when completing an objective
+objective-coins-min: 20
+
+# Multiplier coin boost for players with the mercury.premium permission
+premium-multiplier: 2

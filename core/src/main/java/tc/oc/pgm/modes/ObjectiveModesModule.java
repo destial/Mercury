@@ -12,11 +12,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.material.MaterialData;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import tc.oc.pgm.api.filter.Filter;
 import tc.oc.pgm.api.map.MapModule;
 import tc.oc.pgm.api.map.factory.MapFactory;
 import tc.oc.pgm.api.map.factory.MapModuleFactory;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
+import tc.oc.pgm.features.FeatureDefinitionContext;
 import tc.oc.pgm.goals.GoalMatchModule;
 import tc.oc.pgm.util.text.TextParser;
 import tc.oc.pgm.util.xml.InvalidXMLException;
@@ -69,6 +71,8 @@ public class ObjectiveModesModule implements MapModule {
           name = ChatColor.translateAlternateColorCodes('`', name);
         }
 
+        Filter filter = factory.getFilters().parseFilterProperty(modeEl, "filter");
+
         String showBeforeRaw = modeEl.getAttributeValue("show-before");
         Duration showBefore =
             showBeforeRaw != null ? TextParser.parseDuration(showBeforeRaw) : DEFAULT_SHOW_BEFORE;
@@ -79,16 +83,28 @@ public class ObjectiveModesModule implements MapModule {
           showBefore = Duration.ZERO;
         }
 
-        for (Mode mode : parsedModes) {
-          if (mode.getAfter().equals(after)) {
-            throw new InvalidXMLException(
-                "Already scheduled a mode for " + after.getSeconds() + "s", modeEl);
-          }
+        String id = modeEl.getAttributeValue("id");
+        if (id == null) {
+          String legacyName = name != null ? name : ModeUtils.formatMaterial(material);
+          id = makeUniqueId(legacyName, factory.getFeatures());
         }
-        parsedModes.add(new Mode(material, after, name, showBefore));
+
+        Mode mode = new Mode(id, material, after, name, filter, showBefore);
+        parsedModes.add(mode);
+        factory.getFeatures().addFeature(modeEl, mode);
       }
 
       return new ObjectiveModesModule(parsedModes);
+    }
+
+    private String makeUniqueId(String name, FeatureDefinitionContext features) {
+      String baseId = "mode-" + Mode.makeId(name);
+      if (features.get(baseId) == null) return baseId;
+
+      for (int i = 2; ; i++) {
+        String newId = baseId + "-" + i;
+        if (features.get(newId) == null) return newId;
+      }
     }
   }
 }

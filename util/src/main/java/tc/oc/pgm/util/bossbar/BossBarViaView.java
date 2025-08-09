@@ -1,15 +1,14 @@
 package tc.oc.pgm.util.bossbar;
 
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.api.boss.BossBar;
 
 public class BossBarViaView extends BossBarView {
-
   private boolean visible;
-  private BossBar<?> bossBar;
+  private final BossBar bossBar;
 
-  public BossBarViaView(Plugin plugin, Player viewer, BossBar<?> bossBar) {
+  public BossBarViaView(Plugin plugin, Player viewer, BossBar bossBar) {
     super(plugin, viewer);
     this.bossBar = bossBar;
   }

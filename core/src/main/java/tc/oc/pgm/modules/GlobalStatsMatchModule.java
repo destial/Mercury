@@ -62,6 +62,12 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
     return map.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).orElse(null);
   }
 
+  private Map.Entry<UUID, Double> sortStatsDouble(Map<UUID, Double> map) {
+    return map.entrySet().stream()
+        .max(Comparator.comparingDouble(Map.Entry::getValue))
+        .orElse(null);
+  }
+
   private Map.Entry<UUID, Float> sortStatsFloat(Map<UUID, Float> map) {
     return map.entrySet().stream()
         .max(Comparator.comparingDouble(Map.Entry::getValue))
@@ -124,6 +130,10 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
           break;
         case ARROWS:
           top.put(uuid, (double) stats.getArrowsHit());
+          break;
+        case SCORE:
+          top.put(uuid, stats.getCombatScore());
+          break;
         default:
           break;
       }
@@ -201,6 +211,7 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
     Map<UUID, Integer> mvps = new HashMap<>();
     Map<UUID, Integer> elos = new HashMap<>();
     Map<UUID, Integer> arrows = new HashMap<>();
+    Map<UUID, Double> score = new HashMap<>();
     for (Map.Entry<UUID, GlobalStats> entry : all.entrySet()) {
       GlobalStats stats = entry.getValue();
       UUID uuid = entry.getKey();
@@ -219,6 +230,7 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
       if (stats.getLosses() >= 10) wlr.put(uuid, stats.getWins() / (float) (stats.getLosses()));
       elos.put(uuid, stats.getElo());
       arrows.put(uuid, stats.getArrowsHit());
+      score.put(uuid, stats.getCombatScore());
     }
     Map.Entry<UUID, Integer> mostKills = sortStats(kills);
     Map.Entry<UUID, Integer> mostDeaths = sortStats(deaths);
@@ -235,6 +247,7 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
     Map.Entry<UUID, Float> highestWlr = sortStatsFloat(wlr);
     Map.Entry<UUID, Integer> highestElo = sortStats(elos);
     Map.Entry<UUID, Integer> highestArrows = sortStats(arrows);
+    Map.Entry<UUID, Double> highestCombatScore = sortStatsDouble(score);
     UUID random = UUID.randomUUID();
 
     OfflinePlayer kp = Bukkit.getOfflinePlayer(mostKills != null ? mostKills.getKey() : random);
@@ -252,7 +265,14 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
     OfflinePlayer wlp = Bukkit.getOfflinePlayer(highestWlr.getKey());
     OfflinePlayer elp = Bukkit.getOfflinePlayer(highestElo.getKey());
     OfflinePlayer alp = Bukkit.getOfflinePlayer(highestArrows.getKey());
+    OfflinePlayer slp = Bukkit.getOfflinePlayer(highestCombatScore.getKey());
     DecimalFormat df = new DecimalFormat("#.##");
+    audience.sendMessage(
+        TranslatableComponent.of(
+            "match.stats.combatScore.by",
+            TextColor.GRAY,
+            TextComponent.of(getName(slp), TextColor.YELLOW),
+            TextComponent.of(df.format(highestCombatScore.getValue()), TextColor.GREEN)));
     audience.sendMessage(
         TranslatableComponent.of(
             "match.stats.killsDeaths",
@@ -340,6 +360,11 @@ public class GlobalStatsMatchModule implements MatchModule, Listener {
             TextComponent.of(Integer.toString(stats.getDeaths()), TextColor.RED),
             TextComponent.of(df.format(stats.getKDR()), TextColor.GREEN),
             TextComponent.of(Integer.toString(stats.getLongestShot()), TextColor.YELLOW)));
+    audience.sendMessage(
+        TranslatableComponent.of(
+            "match.stats.combatScore",
+            TextColor.GRAY,
+            TextComponent.of(df.format(stats.getCombatScore()), TextColor.GREEN)));
     audience.sendMessage(
         TranslatableComponent.of(
             "match.stats.winnings",

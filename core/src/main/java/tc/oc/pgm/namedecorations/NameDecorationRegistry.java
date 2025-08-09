@@ -1,10 +1,10 @@
 package tc.oc.pgm.namedecorations;
 
 import net.kyori.text.Component;
-import net.kyori.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import tc.oc.pgm.api.party.Party;
+import tc.oc.pgm.api.player.MatchPlayer;
 
 public interface NameDecorationRegistry extends Listener {
 
@@ -38,9 +38,9 @@ public interface NameDecorationRegistry extends Listener {
    * @param party The party this player is currently in
    * @return The name, decorated, in component form
    */
-  default Component getDecoratedNameComponent(Player player, Party party) {
-    return TextComponent.of(getDecoratedName(player, party));
-  }
+  Component getDecoratedNameComponent(Player player, Party party);
+
+  Component getDecoratedNameComponent(MatchPlayer player);
 
   /**
    * Set what name decoration provider this registry should use

@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.community.events.PlayerVanishEvent;
 import tc.oc.pgm.events.PlayerParticipationStartEvent;
 import tc.oc.pgm.util.chat.Audience;
@@ -69,9 +70,16 @@ public class AFKListener implements Listener {
                   Collections.unmodifiableSet(notMoved.entrySet());
               for (Map.Entry<UUID, Long> noMove : noMoveSet) {
                 if (noMove.getValue() <= System.currentTimeMillis()) {
-                  afkPlayers.put(noMove.getKey(), System.currentTimeMillis() + AFK_KICK);
                   Player player = Bukkit.getPlayer(noMove.getKey());
-                  if (player != null) {
+                  if (player == null) {
+                    notMoved.remove(noMove.getKey());
+                    continue;
+                  }
+
+                  MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+                  if (matchPlayer != null
+                      && (!matchPlayer.isParticipating() || !matchPlayer.getMatch().isRunning())) {
+                    afkPlayers.put(noMove.getKey(), System.currentTimeMillis() + AFK_KICK);
                     player.sendMessage(ChatColor.GOLD + "You are now AFK!");
                   }
                 }
@@ -82,25 +90,26 @@ public class AFKListener implements Listener {
               for (Map.Entry<UUID, Long> afk : afkSet) {
                 notMoved.remove(afk.getKey());
                 Player player = Bukkit.getPlayer(afk.getKey());
+                if (player == null) {
+                  afkPlayers.remove(afk.getKey());
+                  continue;
+                }
+
                 long current = System.currentTimeMillis();
                 if (afk.getValue() <= current) {
-                  if (player != null) {
-                    player.kickPlayer(
-                        ChatColor.GOLD + "You have been kicked for being AFK too long!");
-                  }
+                  player.kickPlayer(
+                      ChatColor.GOLD + "You have been kicked for being AFK too long!");
                 } else {
-                  if (player != null) {
-                    Audience audience = Audience.get(player);
-                    long millis = afk.getValue() - current;
-                    int s = (int) (millis / 1000);
-                    String randomMessage = afkMessages[(int) (Math.random() * afkMessages.length)];
-                    audience.showTitle(
-                        TextComponent.of("You are now AFK (" + s + "s)", TextColor.GOLD),
-                        TextComponent.of(randomMessage, TextColor.GREEN),
-                        0,
-                        30,
-                        0);
-                  }
+                  Audience audience = Audience.get(player);
+                  long millis = afk.getValue() - current;
+                  int s = (int) (millis / 1000);
+                  String randomMessage = afkMessages[(int) (Math.random() * afkMessages.length)];
+                  audience.showTitle(
+                      TextComponent.of("You are now AFK (" + s + "s)", TextColor.GOLD),
+                      TextComponent.of(randomMessage, TextColor.GREEN),
+                      0,
+                      30,
+                      0);
                 }
               }
             },

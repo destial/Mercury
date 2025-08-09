@@ -18,7 +18,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -108,6 +107,7 @@ public final class PGMConfig implements Config {
 
   // community.*
   private final boolean communityMode;
+  private boolean afk;
 
   // groups.*
   private final List<Config.Group> groups;
@@ -215,6 +215,9 @@ public final class PGMConfig implements Config {
         rightText == null || rightText.isEmpty() ? null : parseComponent(rightText);
 
     this.communityMode = parseBoolean(config.getString("community.enabled", "true"));
+    if (communityMode) {
+      afk = parseBoolean(config.getString("community.afk", "true"));
+    }
 
     final ConfigurationSection section = config.getConfigurationSection("groups");
     this.groups = new ArrayList<>();
@@ -244,7 +247,7 @@ public final class PGMConfig implements Config {
   }
 
   public static final Map<?, ?> DEFAULT_REMOTE_REPO =
-      ImmutableMap.of("uri", "https://github.com/PGMDev/Maps", "path", "default-maps");
+      ImmutableMap.of("uri", "https://github.com/destial/maps", "path", "default-maps");
 
   public static void registerRemoteMapSource(
       List<MapSourceFactory> mapSources, Map<?, ?> repository) {
@@ -408,14 +411,11 @@ public final class PGMConfig implements Config {
     // Will be sorted based on priority, in ascending order
     Collections.sort(
         groups,
-        new Comparator<String>() {
-          @Override
-          public int compare(String o1, String o2) {
-            try {
-              return Integer.parseInt(o1.split("\\|")[0]) - Integer.parseInt(o2.split("\\|")[0]);
-            } catch (Throwable t) {
-              return 0;
-            }
+        (o1, o2) -> {
+          try {
+            return Integer.parseInt(o1.split("\\|")[0]) - Integer.parseInt(o2.split("\\|")[0]);
+          } catch (Throwable t) {
+            return 0;
           }
         });
 
@@ -577,6 +577,11 @@ public final class PGMConfig implements Config {
   @Override
   public int getGriefScore() {
     return griefScore;
+  }
+
+  @Override
+  public boolean isAfkModuleEnabled() {
+    return afk;
   }
 
   @Override

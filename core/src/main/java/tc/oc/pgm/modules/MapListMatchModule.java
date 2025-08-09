@@ -261,7 +261,7 @@ public class MapListMatchModule implements MatchModule, Listener {
         player.sendWarning(TextComponent.of("Coins are currently disabled!"));
         return;
       }
-      if (player.getCoins().getCoins() < 10000) {
+      if (player.getCoins().getCoins() < PGM.get().getShop().getBuyMapCost()) {
         player.sendWarning(
             TextComponent.of(
                 "You do not have enough coins! 10,000 coins is needed to buy a map cycle!",
@@ -281,7 +281,7 @@ public class MapListMatchModule implements MatchModule, Listener {
         return;
       }
 
-      player.getCoins().removeCoins(10000);
+      player.getCoins().removeCoins(PGM.get().getShop().getBuyMapCost());
       PGM.get().getMapOrder().setNextMap(map);
       player.sendMessage(
           TextComponent.of("You have set the next map to be: " + map.getName(), TextColor.GREEN));
@@ -292,7 +292,9 @@ public class MapListMatchModule implements MatchModule, Listener {
                   player.getNameLegacy()
                       + " has bought a map cycle to "
                       + map.getName()
-                      + " for 10,000 coins!",
+                      + " for "
+                      + PGM.get().getShop().getBuyMapCost()
+                      + " coins!",
                   TextColor.AQUA));
 
       player.getBukkit().closeInventory();

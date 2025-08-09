@@ -48,6 +48,7 @@
                         <includes>
                             <include>tc.oc.pgm:*:*</include>
                             <include>xyz.destiall.java:*:*</include>
+                            <include>com.github.games647:*:*</include>
                             <include>org.jdom:jdom2:*</include>
                             <include>net.kyori:text-*:*</include>
                             <include>org.json:*:*</include>
@@ -70,8 +71,12 @@
                             <shadedPattern>tc.oc.pgm.lib.app.ashcon.intake</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>net.kyori</pattern>
-                            <shadedPattern>tc.oc.pgm.lib.net.kyori</shadedPattern>
+                            <pattern>net.kyori.text</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.net.kyori.text</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori.minecraft</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.net.kyori.minecraft</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.jdom2</pattern>
@@ -92,6 +97,10 @@
                         <relocation>
                             <pattern>xyz.destiall</pattern>
                             <shadedPattern>tc.oc.pgm.lib.xyz.destiall</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.github.games647</pattern>
+                            <shadedPattern>tc.oc.pgm.lib.com.github</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

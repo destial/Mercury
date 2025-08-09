@@ -1,4 +1,4 @@
-package tc.oc.pgm.listeners;
+package tc.oc.pgm.listeners.support;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;

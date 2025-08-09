@@ -1,5 +1,6 @@
 package tc.oc.pgm.namedecorations;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import net.kyori.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import tc.oc.pgm.api.Config;
 import tc.oc.pgm.api.PGM;
 
@@ -88,8 +90,12 @@ public class ConfigDecorationProvider implements NameDecorationProvider {
   private Stream<? extends Config.Group> groups(UUID uuid) {
     final Player player = Bukkit.getPlayer(uuid);
     if (player == null) return Stream.empty();
-
+    List<String> nodes =
+        player.getEffectivePermissions().stream()
+            .filter(PermissionAttachmentInfo::getValue)
+            .map(PermissionAttachmentInfo::getPermission)
+            .collect(Collectors.toList());
     return PGM.get().getConfiguration().getGroups().stream()
-        .filter(g -> player.hasPermission(g.getPermission()));
+        .filter(g -> nodes.stream().anyMatch(p -> p.equals(g.getPermission().getName())));
   }
 }

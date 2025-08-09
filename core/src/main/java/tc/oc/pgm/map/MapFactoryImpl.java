@@ -59,7 +59,7 @@ public class MapFactoryImpl extends ModuleGraph<MapModule, MapModuleFactory<? ex
   }
 
   @Override
-  protected MapModule createModule(MapModuleFactory factory) throws ModuleLoadException {
+  protected MapModule<?> createModule(MapModuleFactory<?> factory) throws ModuleLoadException {
     try {
       return factory.parse(this, logger, document);
     } catch (InvalidXMLException e) {
@@ -115,7 +115,7 @@ public class MapFactoryImpl extends ModuleGraph<MapModule, MapModuleFactory<? ex
       throw e;
     }
 
-    for (MapModule module : getModules()) {
+    for (MapModule<?> module : getModules()) {
       module.postParse(this, logger, document);
     }
   }

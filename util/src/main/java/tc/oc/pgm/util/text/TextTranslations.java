@@ -8,11 +8,13 @@ import com.google.common.collect.Tables;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
@@ -28,6 +30,7 @@ import net.kyori.text.renderer.TranslatableComponentRenderer;
 import net.kyori.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
+import tc.oc.pgm.api.PGM;
 
 /** A singleton for accessing {@link MessageFormat} and {@link Component} translations. */
 @SuppressWarnings("UnstableApiUsage")
@@ -177,8 +180,16 @@ public final class TextTranslations {
 
       final ResourceBundle resource;
       try {
-        resource = ResourceBundle.getBundle(resourceName, locale, SOURCE_CONTROL);
-      } catch (MissingResourceException e) {
+        File file =
+            new File(PGM.get().getDataFolder(), resourceName + locale.toString() + ".properties");
+        if (file.exists()) {
+          URL[] urls = {file.toURI().toURL()};
+          ClassLoader loader = new URLClassLoader(urls);
+          resource = ResourceBundle.getBundle(resourceName, locale, loader, SOURCE_CONTROL);
+        } else {
+          resource = ResourceBundle.getBundle(resourceName, locale, SOURCE_CONTROL);
+        }
+      } catch (Exception e) {
         continue;
       }
 

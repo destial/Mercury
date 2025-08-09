@@ -1,4 +1,4 @@
-package tc.oc.pgm.listeners;
+package tc.oc.pgm.listeners.support;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +18,11 @@ import tc.oc.pgm.api.player.event.MatchPlayerAddEvent;
 import tc.oc.pgm.timelimit.TimeLimitMatchModule;
 import tc.oc.pgm.timelimit.events.TimeLimitChangeEvent;
 
-public class BadlionListener implements Listener {
+public class BadlionTimerListener implements Listener {
   private final TimerApi api;
   private Timer timer;
 
-  public BadlionListener() {
+  public BadlionTimerListener() {
     PGM.get().getLogger().info("Found BadlionClientTimerAPI! Hooking into it!");
     api = TimerApi.getInstance();
   }

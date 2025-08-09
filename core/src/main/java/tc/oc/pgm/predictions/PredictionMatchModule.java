@@ -38,8 +38,8 @@ import tc.oc.pgm.util.text.TextTranslations;
 
 @ListenerScope(MatchScope.LOADED)
 public class PredictionMatchModule implements MatchModule, Listener {
-  private static final String SYMBOL_IGNORE = "\u2715"; // ✕
-  private static final String SYMBOL_VOTED = "\u2714"; // ✔
+  private static final String SYMBOL_IGNORE = "✕"; // ✕
+  private static final String SYMBOL_VOTED = "✔"; // ✔
   private static final int VOTE_SLOT = 3;
   private static final int TIMER = 5;
   public static final int DEFAULT_BET = 250;

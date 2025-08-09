@@ -7,8 +7,8 @@ import tc.oc.pgm.api.Config;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.match.event.MatchFinishEvent;
 import tc.oc.pgm.api.player.MatchPlayer;
-import tc.oc.pgm.listeners.LunarListener;
-import tc.oc.pgm.listeners.VulcanListener;
+import tc.oc.pgm.listeners.support.LunarListener;
+import tc.oc.pgm.listeners.support.VulcanListener;
 import tc.oc.pgm.spawns.SpawnMatchModule;
 
 public class Participating extends State {
@@ -24,7 +24,7 @@ public class Participating extends State {
     super.enterState();
     permissionAttachment = bukkit.addAttachment(PGM.get());
     for (Config.Group group : PGM.get().getConfiguration().getGroups()) {
-      if (group instanceof LunarListener.Verified || group instanceof VulcanListener.Forge)
+      if (group instanceof LunarListener.LunarVerified || group instanceof VulcanListener.Forge)
         continue;
       if (bukkit.hasPermission(group.getPermission())) {
         permissionAttachment.setPermission(group.getParticipantPermission(), true);

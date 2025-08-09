@@ -41,6 +41,7 @@ public class ControlPointDefinition extends GoalDefinition {
   // Capture time multiplier for increasing or decreasing capture time based on the number of
   // players on the point
   private final float timeMultiplier;
+  private final float decayRate;
 
   // The team that owns the point when the match starts, null for no owner (neutral state) or ffa
   private final TeamFactory initialOwner;
@@ -68,10 +69,14 @@ public class ControlPointDefinition extends GoalDefinition {
 
   // Rate that the owner's score increases, or 0 if the CP does not affect score
   private final float pointsPerSecond;
+  private final float recoveryRate;
+  private final float ownedDecayRate;
+  private final float contestedRate;
 
   // If this is less than +inf, the effective pointsPerSecond will increase over time
   // at an exponential rate, such that it doubles every time this many seconds elapses.
   private final float pointsGrowth;
+  private final float pointsOwner;
 
   // If true, capturing progress is displayed on the scoreboard
   private final boolean showProgress;
@@ -90,6 +95,10 @@ public class ControlPointDefinition extends GoalDefinition {
       BlockVector capturableDisplayBeacon,
       Duration timeToCapture,
       float timeMultiplier,
+      float decayRate,
+      float recoveryRate,
+      float ownedDecayRate,
+      float contestedRate,
       TeamFactory initialOwner,
       CaptureCondition captureCondition,
       boolean incrementalCapture,
@@ -97,6 +106,7 @@ public class ControlPointDefinition extends GoalDefinition {
       boolean permanent,
       float pointsPerSecond,
       float pointsGrowth,
+      float pointsOwner,
       boolean progress) {
 
     super(id, name, required, visible);
@@ -117,42 +127,77 @@ public class ControlPointDefinition extends GoalDefinition {
     this.pointsPerSecond = pointsPerSecond;
     this.pointsGrowth = pointsGrowth;
     this.showProgress = progress;
+    this.pointsOwner = pointsOwner;
+    this.decayRate = decayRate;
+    this.recoveryRate = recoveryRate;
+    this.contestedRate = contestedRate;
+    this.ownedDecayRate = ownedDecayRate;
   }
 
   @Override
   public String toString() {
-    return "ControlPointDefinition {name="
-        + this.getName()
-        + " id="
-        + this.getId()
-        + " timeToCapture="
-        + this.getTimeToCapture()
-        + " timeMultiplier="
-        + this.getTimeMultiplier()
-        + " initialOwner="
-        + this.getInitialOwner()
-        + " captureCondition="
-        + this.getCaptureCondition()
-        + " incrementalCapture="
-        + this.isIncrementalCapture()
-        + " neutralState="
-        + this.hasNeutralState()
-        + " permanent="
-        + this.isPermanent()
-        + " captureRegion="
-        + this.getCaptureRegion()
-        + " captureFilter="
-        + this.getCaptureFilter()
-        + " playerFilter="
-        + this.getPlayerFilter()
-        + " progressDisplay="
-        + this.getProgressDisplayRegion()
-        + " ownerDisplay="
-        + this.getControllerDisplayRegion()
-        + " beacon="
-        + this.getCapturableDisplayBeacon()
-        + " visible="
-        + this.isVisible();
+    return "ControlPointDefinition{"
+        + "captureRegion="
+        + captureRegion
+        + ", captureFilter="
+        + captureFilter
+        + ", playerFilter="
+        + playerFilter
+        + ", progressDisplayRegion="
+        + progressDisplayRegion
+        + ", ownerDisplayRegion="
+        + ownerDisplayRegion
+        + ", visualMaterials="
+        + visualMaterials
+        + ", capturableDisplayBeacon="
+        + capturableDisplayBeacon
+        + ", timeToCapture="
+        + timeToCapture
+        + ", timeMultiplier="
+        + timeMultiplier
+        + ", decayRate="
+        + decayRate
+        + ", initialOwner="
+        + initialOwner
+        + ", captureCondition="
+        + captureCondition
+        + ", incrementalCapture="
+        + incrementalCapture
+        + ", neutralState="
+        + neutralState
+        + ", permanent="
+        + permanent
+        + ", pointsPerSecond="
+        + pointsPerSecond
+        + ", recoveryRate="
+        + recoveryRate
+        + ", ownedDecayRate="
+        + ownedDecayRate
+        + ", contestedRate="
+        + contestedRate
+        + ", pointsGrowth="
+        + pointsGrowth
+        + ", pointsOwner="
+        + pointsOwner
+        + ", showProgress="
+        + showProgress
+        + '}';
+  }
+
+  public float getDecayRate() {
+    return decayRate;
+  }
+
+  public float getContestedRate() {
+    return contestedRate;
+  }
+
+  public float getOwnedDecayRate() {
+    return ownedDecayRate;
+  }
+
+  public float getPointsOwner() {
+    return pointsOwner;
   }
 
   public Region getCaptureRegion() {

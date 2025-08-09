@@ -39,7 +39,7 @@
     <modules>
         <module>util</module>
         <module>core</module>
-        <module>server</module>
+        <!-- <module>server</module> -->
     </modules>
     <repositories>
         <repository>
@@ -55,7 +55,7 @@
             <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>viaversion.com</id>
+            <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
         <!-- TODO: move SportPaper to jitpack.io -->
@@ -66,6 +66,10 @@
         <repository>
             <id>destiall</id>
             <url>https://repo.destial.xyz/repository/maven-snapshots</url>
+        </repository>
+        <repository>
+            <id>lunarclient</id>
+            <url>https://repo.lunarclient.dev</url>
         </repository>
     </repositories>
 
@@ -100,7 +104,13 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20201115</version>
+            <version>20231013</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.games647</groupId>
+            <artifactId>craftapi</artifactId>
+            <version>0.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -123,13 +133,25 @@
         <dependency>
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
-            <version>1.22.0</version>
+            <version>1.26.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.lunarclient</groupId>
-            <artifactId>bukkitapi</artifactId>
-            <version>1.0.0</version>
+            <artifactId>apollo-api</artifactId>
+            <version>1.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lunarclient</groupId>
+            <artifactId>apollo-extra-adventure4</artifactId>
+            <version>1.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.cheatbreaker</groupId>
+            <artifactId>CheatBreakerAPI</artifactId>
+            <version>3.1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -138,21 +160,26 @@
             <version>1.2.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.badlion</groupId>
+            <artifactId>bukkitapi</artifactId>
+            <version>2.0</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Multi-protocol library for future Minecraft versions -->
         <dependency>
-            <groupId>us.myles</groupId>
-            <artifactId>viaversion</artifactId>
-            <version>3.0.2-SNAPSHOT</version>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion-api</artifactId>
+            <version>4.9.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <!-- XML parsing library used for all "map.xml" configuration loading -->
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
-            <version>2.0.6</version>
+            <version>2.0.6.1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -237,6 +264,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                    <verbose>true</verbose>
+                    <fork>true</fork>
+                    <executable>C:\Program Files\Java\jdk1.8.0_261\bin\javac</executable>
+                </configuration>
             </plugin>
 
             <!-- Exposes git information to the build environment -->

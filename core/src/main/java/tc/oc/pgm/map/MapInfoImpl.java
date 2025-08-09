@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
 import net.kyori.text.TranslatableComponent;
+import net.kyori.text.event.HoverEvent;
 import net.kyori.text.format.TextColor;
 import net.kyori.text.format.TextDecoration;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -214,6 +215,11 @@ public class MapInfoImpl implements MapInfo {
 
     if (style.isColor) name.color(TextColor.AQUA);
     if (style.isHighlight) name.decoration(TextDecoration.UNDERLINED, true);
+    name.hoverEvent(
+        HoverEvent.of(
+            HoverEvent.Action.SHOW_TEXT,
+            TextComponent.of(tags.stream().map(MapTag::getName).collect(Collectors.joining(", ")))
+                .color(TextColor.YELLOW)));
     if (style.showAuthors) {
       return TranslatableComponent.of(
           "misc.authorship",

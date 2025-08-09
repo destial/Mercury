@@ -128,7 +128,7 @@ groups:
     # Description of group - Displayed when hovering over prefix/suffix
     description: "&7Administrator of the server"
     # URL shown below description when hovering over prefix/suffix
-    click-link: "https://merc-ury.dev/"
+    click-link: "https://sgcraft.net/"
     
     # If you want to further customize prefix/suffix flairs, provide components here to override format
     # Only use if you know what you're doing
@@ -189,6 +189,7 @@ community:
   server-name: "" # Name of your server, displayed when players are kicked.
   rules-link: ""  # A URL to a rules website, displayed when players are kicked.
   appeal-msg: ""  # A message, displayed on the kick screen, if a player is banned.
+  afk: true       # Enable AFK module
 
 # Overrides the default database uri.
 #

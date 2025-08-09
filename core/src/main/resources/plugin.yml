@@ -1,5 +1,5 @@
 name: Mercury
-softdepend: [ViaVersion, PlaceholderAPI, Vault, DiscordSRV, Vulcan, LunarClient-API, BadlionClientTimerAPI]
+softdepend: [ViaVersion, PlaceholderAPI, Vault, DiscordSRV, Vulcan, Apollo-Bukkit, CheatBreakerAPI, BadlionClientModAPI, BadlionClientTimerAPI]
 description: ${project.parent.description}
 main: ${project.mainClass}
 version: ${project.version}

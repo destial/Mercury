@@ -104,9 +104,13 @@ public class EloMatchModule implements MatchModule, Listener {
     match.getExecutor(MatchScope.LOADED).schedule(this::updateEloStatus, 1L, TimeUnit.SECONDS);
   }
 
+  public boolean hasElo(MatchPlayer player) {
+    return player.getSettings().getValue(SettingKey.ELO) == SettingValue.ELO_ON;
+  }
+
   @EventHandler
   public void onKill(MatchPlayerDeathEvent e) {
-    if (!isElo) return;
+    if (!isElo && !hasElo(e.getVictim())) return;
 
     EloConfig.EloOptions killElo =
         PGM.get().getConfiguration().getEloConfig().getSettings().get("kill");
@@ -195,7 +199,7 @@ public class EloMatchModule implements MatchModule, Listener {
 
   @EventHandler
   public void onKillstreak(KillstreakEvent e) {
-    if (!isElo) return;
+    if (!isElo && !hasElo(e.getPlayer())) return;
 
     EloConfig.EloOptions streakElo =
         PGM.get()
@@ -213,7 +217,8 @@ public class EloMatchModule implements MatchModule, Listener {
 
   @EventHandler
   public void onWool(PlayerWoolPlaceEvent e) {
-    if (!isElo) return;
+    MatchPlayer player = e.getPlayer().getPlayer().orElse(null);
+    if (!isElo && (player != null && !hasElo(player))) return;
 
     EloConfig.EloOptions woolElo =
         PGM.get().getConfiguration().getEloConfig().getSettings().get("objective");
@@ -274,7 +279,7 @@ public class EloMatchModule implements MatchModule, Listener {
 
   @EventHandler
   public void onFlag(FlagCaptureEvent e) {
-    if (!isElo) return;
+    if (!isElo && !hasElo(e.getCarrier())) return;
 
     EloConfig.EloOptions flagElo =
         PGM.get().getConfiguration().getEloConfig().getSettings().get("objective");

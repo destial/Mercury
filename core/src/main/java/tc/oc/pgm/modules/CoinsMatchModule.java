@@ -11,6 +11,7 @@ import net.kyori.text.format.TextColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.Permissions;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
@@ -55,7 +56,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
     if (killer == event.getVictim()) {
       return;
     }
-    int random = (int) Math.floor(Math.random() * 10) + 1;
+    int random =
+        (int)
+                Math.floor(
+                    Math.random() * PGM.get().getShop().getKillMax()
+                        - PGM.get().getShop().getKillMin())
+            + PGM.get().getShop().getKillMin();
     TextComponent objective =
         TextComponent.builder()
             .append("killed ", TextColor.YELLOW)
@@ -77,7 +83,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
         continue;
       }
       MatchPlayer destroyer = player.get();
-      int random = (int) Math.floor(Math.random() * 10) + 20;
+      int random =
+          (int)
+                  Math.floor(
+                      Math.random() * PGM.get().getShop().getObjectiveMax()
+                          - PGM.get().getShop().getObjectiveMin())
+              + PGM.get().getShop().getObjectiveMin();
       TextComponent objective =
           TextComponent.builder()
               .append("destroyed ", TextColor.YELLOW)
@@ -101,7 +112,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
       return;
     }
     MatchPlayer placer = player.get();
-    int random = (int) Math.floor(Math.random() * 10) + 20;
+    int random =
+        (int)
+                Math.floor(
+                    Math.random() * PGM.get().getShop().getObjectiveMax()
+                        - PGM.get().getShop().getObjectiveMin())
+            + PGM.get().getShop().getObjectiveMin();
     TextComponent objective =
         TextComponent.builder()
             .append("placed ", TextColor.YELLOW)
@@ -123,7 +139,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
         return;
       }
       MatchPlayer leaker = player.get();
-      int random = (int) Math.floor(Math.random() * 10) + 20;
+      int random =
+          (int)
+                  Math.floor(
+                      Math.random() * PGM.get().getShop().getObjectiveMax()
+                          - PGM.get().getShop().getObjectiveMin())
+              + PGM.get().getShop().getObjectiveMin();
       TextComponent objective =
           TextComponent.builder()
               .append("leaked ", TextColor.YELLOW)
@@ -151,7 +172,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
       if (player == null) {
         continue;
       }
-      int random = (int) Math.floor(Math.random() * 10) + 20;
+      int random =
+          (int)
+                  Math.floor(
+                      Math.random() * PGM.get().getShop().getObjectiveMax()
+                          - PGM.get().getShop().getObjectiveMin())
+              + PGM.get().getShop().getObjectiveMin();
       TextComponent objective =
           TextComponent.builder()
               .append("captured ", TextColor.YELLOW)
@@ -174,7 +200,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
     if (capturer == null) {
       return;
     }
-    int random = (int) Math.floor(Math.random() * 10) + 20;
+    int random =
+        (int)
+                Math.floor(
+                    Math.random() * PGM.get().getShop().getObjectiveMax()
+                        - PGM.get().getShop().getObjectiveMin())
+            + PGM.get().getShop().getObjectiveMin();
     TextComponent objective =
         TextComponent.builder()
             .append("captured ", TextColor.WHITE)
@@ -195,7 +226,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
         if (winnerPlayer == null) {
           continue;
         }
-        int random = (int) Math.floor(Math.random() * 10) + 20;
+        int random =
+            (int)
+                    Math.floor(
+                        Math.random() * PGM.get().getShop().getObjectiveMax()
+                            - PGM.get().getShop().getObjectiveMin())
+                + PGM.get().getShop().getObjectiveMin();
         TextComponent objective =
             TextComponent.builder().append("won the match", TextColor.YELLOW).build();
         addCoins(winnerPlayer, random, objective);
@@ -206,7 +242,7 @@ public class CoinsMatchModule implements MatchModule, Listener {
   public void addCoins(MatchPlayer player, int amount, Component objective) {
     boolean d = false;
     if (player.getBukkit().hasPermission(Permissions.PREM)) {
-      amount *= 2;
+      amount *= PGM.get().getShop().getPremiumMultiplier();
       d = true;
     }
     player.getCoins().addCoins(amount);
@@ -216,7 +252,12 @@ public class CoinsMatchModule implements MatchModule, Listener {
                 TranslatableComponent.of(
                     "death.getcoins",
                     TextColor.YELLOW,
-                    TextComponent.of(amount + (d ? " x2 (Boost)" : ""), TextColor.GOLD),
+                    TextComponent.of(
+                        amount
+                            + (d
+                                ? " x" + PGM.get().getShop().getPremiumMultiplier() + " (Boost)"
+                                : ""),
+                        TextColor.GOLD),
                     objective))
             .build();
     player.showHotbar(message);

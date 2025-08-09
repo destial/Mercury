@@ -1,11 +1,27 @@
 package tc.oc.pgm.api.filter;
 
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import org.bukkit.event.Event;
 import tc.oc.pgm.api.filter.query.Query;
 
 public interface Filter {
 
   /** Least-derived query type that this filter might not abstain from */
   Class<? extends Query> getQueryType();
+
+  default boolean isDynamic() {
+    return !getRelevantEvents().isEmpty();
+  }
+
+  /**
+   * Filters with children are responsible for returning the events of their children.
+   *
+   * <p>Empty list tells us that the filter is not dynamic
+   */
+  default Collection<Class<? extends Event>> getRelevantEvents() {
+    return ImmutableList.of();
+  }
 
   QueryResponse query(Query query);
 

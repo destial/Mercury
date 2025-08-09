@@ -83,7 +83,7 @@ public class VanishManagerImpl implements VanishManager, Listener {
             Bukkit.getServer(),
             DedicatedPlayerList.class,
             "playerList");
-    List<Player> playerView = new VanishedList(playerList.players, vanishedPlayers);
+    List<Player> playerView = new VanishedList();
     Reflect.setDeclaredField(Bukkit.getServer(), "playerView", playerView);
   }
 
@@ -246,14 +246,14 @@ public class VanishManagerImpl implements VanishManager, Listener {
     player.showHotbar(message);
   }
 
-  public static class VanishedList implements List<Player> {
+  private class VanishedList implements List<Player> {
     private final List<EntityPlayer> reference;
     private final java.util.function.Predicate<? super EntityPlayer> filter;
     private final Function<? super EntityPlayer, ? extends Player> map;
 
-    public VanishedList(List<EntityPlayer> reference, List<UUID> vanished) {
-      this.reference = reference;
-      this.filter = (e) -> !vanished.contains(e.getUniqueID());
+    public VanishedList() {
+      this.reference = playerList.players;
+      this.filter = (e) -> !vanishedPlayers.contains(e.getUniqueID());
       this.map = EntityPlayer::getBukkitEntity;
     }
 

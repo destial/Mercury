@@ -11,7 +11,7 @@ pools:
     #  "ordered"  = maps are played in the provided order.
     #  "shuffled" = maps are played in random order.
     #  "voted"    = players vote on which maps are played next.
-    type: ordered
+    type: voted
 
     # Is this map pool enabled?
     enabled: true
@@ -25,8 +25,10 @@ pools:
 
     # A list of map names in this pool. Names are case-sensitive.
     maps:
-      - Airship Battle
-      - Harb
-      - Race for Victory
-      - The Fenland
-      - Warlock
+      - Bowsers Castle
+      - Bullet
+      - Bullet CTW
+      - Eclipse
+      - Eclipse Origins
+      - Pumpking
+      - Sumo

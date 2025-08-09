@@ -1,7 +1,8 @@
-package tc.oc.pgm.listeners;
+package tc.oc.pgm.listeners.support;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
+import static tc.oc.pgm.util.text.TextParser.parseComponentLegacy;
+
+import com.cheatbreaker.api.CheatBreakerAPI;
 import java.util.HashMap;
 import java.util.UUID;
 import net.kyori.text.Component;
@@ -13,52 +14,57 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.Nullable;
 import tc.oc.pgm.api.Config;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.Permissions;
 import tc.oc.pgm.api.event.NameDecorationChangeEvent;
-import tc.oc.pgm.api.event.ReloadEvent;
-import tc.oc.pgm.api.match.Match;
-import tc.oc.pgm.api.match.event.MatchLoadEvent;
-import tc.oc.pgm.api.player.MatchPlayer;
+import tc.oc.pgm.api.player.event.MatchPlayerAddEvent;
 
-public class TabheadsListener implements PluginMessageListener, Listener {
-  private Match match;
+public class CheatBreakerListener implements Listener {
+  private final HashMap<UUID, PermissionAttachment> attachments = new HashMap<>();
 
-  public TabheadsListener() {
-    Bukkit.getServer()
-        .getMessenger()
-        .registerIncomingPluginChannel(PGM.get(), "tabheads:premium", this);
-    register();
+  public CheatBreakerListener() {
+    log("Found CheatBreakerAPI! Hooking into it!");
+    PGM.get().getConfiguration().getGroups().add(new CheatBreakerVerified());
   }
 
   @EventHandler
-  public void onMatchLoad(MatchLoadEvent e) {
-    match = e.getMatch();
-  }
-
-  @Override
-  public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
-    if (!channel.equalsIgnoreCase("tabheads:premium")) return;
-    ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
-    String name = in.readUTF();
-    MatchPlayer matchPlayer = match.getPlayer(player);
-    if (matchPlayer == null) {
-      player = Bukkit.getPlayer(name);
-      matchPlayer = match.getPlayer(player);
-    }
-    if (matchPlayer == null) return;
-    attach(player, Permissions.LEGIT);
+  public void onJoin(MatchPlayerAddEvent e) {
+    Bukkit.getScheduler()
+        .runTaskLater(
+            PGM.get(),
+            () -> {
+              if (CheatBreakerAPI.getInstance().isRunningCheatBreaker(e.getPlayer().getId())) {
+                attach(e.getPlayer().getBukkit());
+              }
+            },
+            5L);
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent e) {
+  public void onLeave(PlayerQuitEvent e) {
     remove(e.getPlayer());
   }
 
-  private final HashMap<UUID, PermissionAttachment> attachments = new HashMap<>();
+  private void attach(Player p) {
+    if (p.hasPermission(Permissions.CHEATBREAKER)) return;
+    attachments.put(p.getUniqueId(), p.addAttachment(PGM.get()));
+    PermissionAttachment a = attachments.get(p.getUniqueId());
+    a.setPermission(Permissions.CHEATBREAKER, true);
+    log(p.getName() + " has been given the " + Permissions.CHEATBREAKER);
+    Bukkit.getScheduler().runTaskLater(PGM.get(), () -> call(p.getUniqueId()), 5L);
+  }
+
+  private void remove(Player p) {
+    PermissionAttachment a = attachments.get(p.getUniqueId());
+    if (a == null) return;
+    if (p.hasPermission(Permissions.CHEATBREAKER)) {
+      a.unsetPermission(Permissions.CHEATBREAKER);
+    }
+    a.remove();
+    attachments.remove(p.getUniqueId());
+  }
 
   private void log(String s) {
     PGM.get().getLogger().info(s);
@@ -68,47 +74,18 @@ public class TabheadsListener implements PluginMessageListener, Listener {
     Bukkit.getPluginManager().callEvent(new NameDecorationChangeEvent(uuid));
   }
 
-  private void attach(Player p, String permission) {
-    if (p.hasPermission(permission)) return;
-    attachments.put(p.getUniqueId(), p.addAttachment(PGM.get()));
-    PermissionAttachment a = attachments.get(p.getUniqueId());
-    a.setPermission(permission, true);
-    log(p.getName() + " has been given the " + permission);
-    call(p.getUniqueId());
-  }
-
-  private void register() {
-    PGM.get().getConfiguration().getGroups().add(new Premium());
-  }
-
-  @EventHandler
-  public void onReload(ReloadEvent e) {
-    register();
-  }
-
-  private void remove(Player p) {
-    PermissionAttachment a = attachments.get(p.getUniqueId());
-    if (a == null) return;
-    if (p.hasPermission(Permissions.LEGIT)) {
-      a.unsetPermission(Permissions.LEGIT);
-    }
-    a.remove();
-    attachments.remove(p.getUniqueId());
-    call(p.getUniqueId());
-  }
-
-  public static class Premium implements Config.Group {
+  public static class CheatBreakerVerified implements Config.Group {
     private final Flair flair;
     private final Permission permission;
 
-    public Premium() {
+    public CheatBreakerVerified() {
       flair = new Flair();
-      permission = Permissions.register(new Permission(Permissions.LEGIT));
+      permission = Permissions.register(new Permission(Permissions.CHEATBREAKER));
     }
 
     @Override
     public String getId() {
-      return "premium";
+      return "cheatbreaker";
     }
 
     @Override
@@ -156,6 +133,14 @@ public class TabheadsListener implements PluginMessageListener, Listener {
     }
 
     private static class Flair implements Config.Flair {
+      private final String suffix;
+      private final String displayName;
+
+      public Flair() {
+        suffix = parseComponentLegacy(" &b✔");
+        displayName = parseComponentLegacy("&bCheatBreaker Player");
+      }
+
       @Override
       public String getPrefix() {
         return null;
@@ -163,7 +148,7 @@ public class TabheadsListener implements PluginMessageListener, Listener {
 
       @Override
       public String getSuffix() {
-        return " &e™";
+        return suffix;
       }
 
       @Override
@@ -173,7 +158,7 @@ public class TabheadsListener implements PluginMessageListener, Listener {
 
       @Override
       public String getDisplayName() {
-        return "";
+        return displayName;
       }
 
       @Override

@@ -32,7 +32,7 @@ public class ProjectileTrailMatchModule implements MatchModule, Listener {
     this.match = match;
     match
         .getExecutor(MatchScope.RUNNING)
-        .scheduleAtFixedRate(this::checkMatchProjectiles, 0l, 50, TimeUnit.MILLISECONDS);
+        .scheduleAtFixedRate(this::checkMatchProjectiles, 0L, 50, TimeUnit.MILLISECONDS);
   }
 
   public void checkMatchProjectiles() {

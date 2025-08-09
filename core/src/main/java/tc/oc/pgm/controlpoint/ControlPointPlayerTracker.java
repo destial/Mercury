@@ -18,8 +18,8 @@ import tc.oc.pgm.util.MatchPlayers;
 /** Tracks which players are on a control point and answers some queries about them */
 public class ControlPointPlayerTracker implements Listener {
   protected final Match match;
-  protected final Region captureRegion;
   protected final Set<MatchPlayer> playersOnPoint = Sets.newHashSet();
+  protected Region captureRegion;
 
   public ControlPointPlayerTracker(Match match, Region captureRegion) {
     this.match = match;
@@ -38,6 +38,14 @@ public class ControlPointPlayerTracker implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onPlayerTeleport(final PlayerTeleportEvent event) {
     this.handlePlayerMove(event.getPlayer(), event.getTo().toVector());
+  }
+
+  public void setRegion(Region region) {
+    this.captureRegion = region;
+    for (MatchPlayer player : match.getPlayers()) {
+      Player bukkit = player.getBukkit();
+      handlePlayerMove(bukkit, bukkit.getLocation().toVector());
+    }
   }
 
   private void handlePlayerMove(Player bukkit, Vector to) {

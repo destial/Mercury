@@ -362,6 +362,10 @@ public class ControlPoint extends SimpleGoal<ControlPointDefinition>
     }
   }
 
+  protected void dominate(Competitor dominantTeam, Duration dominantTime) {
+    dominate(dominantTeam, dominantTime, false);
+  }
+
   /**
    * If there is a neutral state, then the point cannot be owned and captured at the same time. This
    * means that at least one of controllingTeam or capturingTeam must be null at any particular
@@ -382,7 +386,7 @@ public class ControlPoint extends SimpleGoal<ControlPointDefinition>
    * <p>If incremental capturing is disabled, then capturingTimeMillis is reset to zero whenever it
    * stops increasing.
    */
-  private void dominate(Competitor dominantTeam, Duration dominantTime) {
+  protected void dominate(Competitor dominantTeam, Duration dominantTime, boolean contested) {
     if (!this.capturable || !TimeUtils.isLongerThan(dominantTime, Duration.ZERO)) {
       return;
     }

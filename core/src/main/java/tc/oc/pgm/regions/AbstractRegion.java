@@ -1,6 +1,5 @@
 package tc.oc.pgm.regions;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import java.util.Iterator;
 import java.util.Random;
@@ -80,24 +79,12 @@ public abstract class AbstractRegion extends TypedFilter<LocationQuery>
 
   @Override
   public Iterator<BlockVector> getBlockVectorIterator() {
-    return Iterators.filter(
-        this.getBounds().getBlockIterator(),
-        new Predicate<BlockVector>() {
-          @Override
-          public boolean apply(BlockVector vector) {
-            return contains(vector);
-          }
-        });
+    return Iterators.filter(this.getBounds().getBlockIterator(), this::contains);
   }
 
   @Override
   public Iterable<BlockVector> getBlockVectors() {
-    return new Iterable<BlockVector>() {
-      @Override
-      public Iterator<BlockVector> iterator() {
-        return getBlockVectorIterator();
-      }
-    };
+    return this::getBlockVectorIterator;
   }
 
   @Override

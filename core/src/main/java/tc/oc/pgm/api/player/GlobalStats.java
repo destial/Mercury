@@ -82,6 +82,22 @@ public interface GlobalStats {
 
   UUID getId();
 
+  default double getCombatScore() {
+    float kdScore =
+        (getKills() * PER_KILL_DEATH_SCORE)
+            - (getDeaths() * PER_KILL_DEATH_SCORE * NEGATIVE_MODIFIER);
+    float wlScore =
+        (getWins() * PER_WIN_LOSS_SCORE) - (getLosses() * PER_WIN_LOSS_SCORE * NEGATIVE_MODIFIER);
+    int obScore =
+        (getWoolsCaptured() * PER_OBJECTIVE_SCORE)
+            + (getMonumentsBroken() * PER_OBJECTIVE_SCORE)
+            + (getFlagsCaptured() * PER_OBJECTIVE_SCORE)
+            + (getCoresLeaked() * PER_OBJECTIVE_SCORE);
+    int mvpScore = (getMVP() * PER_MVP_SCORE);
+
+    return kdScore + wlScore + obScore + mvpScore + getLongestShot();
+  }
+
   static Map<UUID, GlobalStats> allStats() {
     return PGM.get().getDatastore().getAllStats();
   }
@@ -102,5 +118,12 @@ public interface GlobalStats {
     MVP,
     WLR,
     ELO,
+    SCORE
   }
+
+  float PER_KILL_DEATH_SCORE = 0.5f;
+  int PER_WIN_LOSS_SCORE = 10;
+  float NEGATIVE_MODIFIER = 2.5f;
+  int PER_OBJECTIVE_SCORE = 5;
+  int PER_MVP_SCORE = 2;
 }

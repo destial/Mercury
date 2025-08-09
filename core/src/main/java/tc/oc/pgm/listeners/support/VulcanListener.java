@@ -1,4 +1,6 @@
-package tc.oc.pgm.listeners;
+package tc.oc.pgm.listeners.support;
+
+import static tc.oc.pgm.util.text.TextParser.parseComponentLegacy;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -81,6 +83,14 @@ public class VulcanListener implements Listener {
     }
 
     private static class Flair implements Config.Flair {
+      private final String suffix;
+      private final String displayName;
+
+      public Flair() {
+        suffix = parseComponentLegacy(" &f∬");
+        displayName = parseComponentLegacy("&fForge Player");
+      }
+
       @Override
       public String getPrefix() {
         return null;
@@ -88,7 +98,7 @@ public class VulcanListener implements Listener {
 
       @Override
       public String getSuffix() {
-        return " &f∬";
+        return suffix;
       }
 
       @Override
@@ -98,7 +108,7 @@ public class VulcanListener implements Listener {
 
       @Override
       public String getDisplayName() {
-        return "";
+        return displayName;
       }
 
       @Override
@@ -182,6 +192,13 @@ public class VulcanListener implements Listener {
     }
 
     private static class Flair implements Config.Flair {
+      private final String suffix;
+      private final String displayName;
+
+      public Flair() {
+        suffix = parseComponentLegacy(" &cඞ");
+        displayName = parseComponentLegacy("&cSuspicious Player");
+      }
 
       @Override
       public String getPrefix() {
@@ -190,7 +207,7 @@ public class VulcanListener implements Listener {
 
       @Override
       public String getSuffix() {
-        return " &cඞ";
+        return suffix;
       }
 
       @Override
@@ -200,7 +217,7 @@ public class VulcanListener implements Listener {
 
       @Override
       public String getDisplayName() {
-        return "";
+        return displayName;
       }
 
       @Override

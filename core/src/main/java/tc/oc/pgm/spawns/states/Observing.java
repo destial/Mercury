@@ -20,8 +20,8 @@ import tc.oc.pgm.api.match.event.MatchStartEvent;
 import tc.oc.pgm.api.party.Competitor;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.events.PlayerJoinPartyEvent;
-import tc.oc.pgm.listeners.LunarListener;
-import tc.oc.pgm.listeners.VulcanListener;
+import tc.oc.pgm.listeners.support.LunarListener;
+import tc.oc.pgm.listeners.support.VulcanListener;
 import tc.oc.pgm.spawns.ObserverToolFactory;
 import tc.oc.pgm.spawns.Spawn;
 import tc.oc.pgm.spawns.SpawnMatchModule;
@@ -52,7 +52,7 @@ public class Observing extends State {
 
     permissionAttachment = bukkit.addAttachment(PGM.get());
     for (Config.Group group : PGM.get().getConfiguration().getGroups()) {
-      if (group instanceof LunarListener.Verified || group instanceof VulcanListener.Forge)
+      if (group instanceof LunarListener.LunarVerified || group instanceof VulcanListener.Forge)
         continue;
       if (bukkit.hasPermission(group.getPermission())) {
         permissionAttachment.setPermission(group.getObserverPermission(), true);

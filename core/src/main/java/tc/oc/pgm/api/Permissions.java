@@ -44,10 +44,12 @@ public interface Permissions {
   String OP = ROOT + ".*";
 
   String MAPMAKER = GROUP + ".mapmaker"; // Permission group for mapmakers, defined in config.yml
-  String VERIFIED = GROUP + ".verified";
+  String LUNAR = GROUP + ".lunar";
+  String BADLION = GROUP + ".badlion";
+  String CHEATBREAKER = GROUP + ".cheatbreaker";
   String FORGE = GROUP + ".forge";
   String SUS = GROUP + ".sus";
-  String LEGIT = GROUP + ".premium";
+  String BOUGHT_ACCOUNT = GROUP + ".premium";
 
   // Role-specific permission nodes
   Permission DEFAULT =

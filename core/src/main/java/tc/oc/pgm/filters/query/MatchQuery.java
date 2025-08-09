@@ -25,8 +25,7 @@ public class MatchQuery extends Query implements tc.oc.pgm.api.filter.query.Matc
     if (this == o) return true;
     if (!(o instanceof MatchQuery)) return false;
     MatchQuery query = (MatchQuery) o;
-    if (!match.equals(query.match)) return false;
-    return true;
+    return match.equals(query.match);
   }
 
   @Override

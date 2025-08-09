@@ -19,6 +19,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
@@ -28,6 +29,7 @@ import tc.oc.pgm.api.Datastore;
 import tc.oc.pgm.api.Modules;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.Permissions;
+import tc.oc.pgm.api.Shop;
 import tc.oc.pgm.api.community.achievement.AchievementManager;
 import tc.oc.pgm.api.community.achievement.AchievementManagerImpl;
 import tc.oc.pgm.api.community.vanish.VanishManager;
@@ -49,6 +51,14 @@ import tc.oc.pgm.community.features.VanishManagerImpl;
 import tc.oc.pgm.db.CacheDatastore;
 import tc.oc.pgm.db.SQLDatastore;
 import tc.oc.pgm.listeners.*;
+import tc.oc.pgm.listeners.support.BadlionListener;
+import tc.oc.pgm.listeners.support.BadlionTimerListener;
+import tc.oc.pgm.listeners.support.CheatBreakerListener;
+import tc.oc.pgm.listeners.support.DiscordSRVListener;
+import tc.oc.pgm.listeners.support.DisguiseListener;
+import tc.oc.pgm.listeners.support.LunarListener;
+import tc.oc.pgm.listeners.support.PremiumAuthListener;
+import tc.oc.pgm.listeners.support.VulcanListener;
 import tc.oc.pgm.map.MapLibraryImpl;
 import tc.oc.pgm.match.MatchManagerImpl;
 import tc.oc.pgm.match.NoopAchievementManager;
@@ -70,6 +80,7 @@ import tc.oc.pgm.util.xml.InvalidXMLException;
 public class PGMPlugin extends JavaPlugin implements PGM {
 
   private Config config;
+  private Shop shop;
   private Logger gameLogger;
   private Datastore datastore;
   private MapLibrary mapLibrary;
@@ -254,6 +265,17 @@ public class PGMPlugin extends JavaPlugin implements PGM {
       return;
     }
 
+    try {
+      File shop = new File(getDataFolder(), "shop.yml");
+      if (!shop.exists()) {
+        saveResource("shop.yml", true);
+      }
+      this.shop = new PGMShop(YamlConfiguration.loadConfiguration(shop));
+    } catch (Exception e) {
+      getGameLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+      return;
+    }
+
     if (!startup) {
       getGameLogger()
           .log(
@@ -279,6 +301,11 @@ public class PGMPlugin extends JavaPlugin implements PGM {
   @Override
   public Config getConfiguration() {
     return config;
+  }
+
+  @Override
+  public Shop getShop() {
+    return shop;
   }
 
   @Override
@@ -374,16 +401,28 @@ public class PGMPlugin extends JavaPlugin implements PGM {
     registerEvents(new MatchAnnouncer());
     registerEvents(new MotdListener());
     registerEvents(new ServerPingDataListener(matchManager, mapOrder, getLogger(), vanishManager));
+
     if (discordsrv) registerEvents(new DiscordSRVListener());
     if (vulcan) registerEvents(new VulcanListener());
-    if (Bukkit.getPluginManager().getPlugin("LunarClient-API") != null)
+
+    if (Bukkit.getPluginManager().getPlugin("Apollo-Bukkit") != null)
       registerEvents(new LunarListener());
-    if (Bukkit.getPluginManager().getPlugin("BadlionClientTimerAPI") != null)
+
+    if (Bukkit.getPluginManager().getPlugin("CheatBreakerAPI") != null)
+      registerEvents(new CheatBreakerListener());
+
+    if (Bukkit.getPluginManager().getPlugin("BadlionClientModAPI") != null)
       registerEvents(new BadlionListener());
+    else if (Bukkit.getPluginManager().getPlugin("BadlionClientTimerAPI") != null)
+      registerEvents(new BadlionTimerListener());
+
     if (Bukkit.getPluginManager().getPlugin("Disguise") != null)
       registerEvents(new DisguiseListener());
-    if (Bukkit.getPluginManager().getPlugin("Events") == null) registerEvents(new AFKListener());
-    registerEvents(new TabheadsListener());
+
+    if (getConfiguration().isAfkModuleEnabled()
+        && Bukkit.getPluginManager().getPlugin("Events") == null) registerEvents(new AFKListener());
+
+    if (!Bukkit.getOnlineMode()) registerEvents(new PremiumAuthListener());
   }
 
   private class InGameHandler extends Handler {

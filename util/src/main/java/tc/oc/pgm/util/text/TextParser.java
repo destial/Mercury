@@ -397,7 +397,6 @@ public final class TextParser {
    * @throws TextException If there is json present and it is invalid.
    * @see #parseComponent(String) For using the new component system.
    */
-  @Deprecated
   public static String parseComponentLegacy(String text) throws TextException {
     return LegacyComponentSerializer.legacy().serialize(parseComponent(text));
   }

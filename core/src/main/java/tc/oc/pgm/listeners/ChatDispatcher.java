@@ -1,5 +1,7 @@
 package tc.oc.pgm.listeners;
 
+import static tc.oc.pgm.util.text.TextParser.parseComponentLegacy;
+
 import app.ashcon.intake.Command;
 import app.ashcon.intake.parametric.annotation.Text;
 import com.google.common.cache.Cache;
@@ -23,7 +25,6 @@ import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
 import net.kyori.text.TranslatableComponent;
 import net.kyori.text.event.ClickEvent;
-import net.kyori.text.event.HoverEvent;
 import net.kyori.text.format.TextColor;
 import net.kyori.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -35,8 +36,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.Permissions;
 import tc.oc.pgm.api.community.vanish.VanishManager;
@@ -44,7 +43,6 @@ import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchManager;
 import tc.oc.pgm.api.party.Party;
 import tc.oc.pgm.api.player.MatchPlayer;
-import tc.oc.pgm.api.player.PlayerData;
 import tc.oc.pgm.api.setting.SettingKey;
 import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.community.command.ReportCommand;
@@ -563,6 +561,9 @@ public class ChatDispatcher implements Listener {
 
   private Component replaceFormat(
       MatchPlayer player, String message, String format, SettingValue chatType) {
+
+    TextComponent.Builder componentBuilder = TextComponent.builder();
+
     String messageCode = names.getMessageColor(player.getBukkit());
     ChatColor color = ChatColor.RESET;
     if (!messageCode.isEmpty()) {
@@ -573,53 +574,57 @@ public class ChatDispatcher implements Listener {
       color = ChatColor.YELLOW;
     }
     Player p = player.getBukkit();
-    format = format.replace("<player>", names.getDecoratedName(p, player.getParty()));
+    if (PGM.get().isPAPIEnabled())
+      format = parseComponentLegacy(PlaceholderAPI.setPlaceholders(p, format));
 
-    if (PGM.get().isPAPIEnabled()) format = PlaceholderAPI.setPlaceholders(p, format);
+    int playerIndex = format.indexOf("<player>");
+    int messageIndex = format.indexOf("<message>");
 
-    format = ChatColor.translateAlternateColorCodes('&', format);
+    StringBuilder previousComponent = new StringBuilder();
+    boolean lastAdded = true;
 
-    StringBuilder coloredMessage = new StringBuilder();
-    for (int i = 0; i < message.length(); i++)
-      coloredMessage.append(color).append(message.charAt(i));
+    for (int j = 0; j < format.length(); j++) {
+      if (j == playerIndex) {
+        componentBuilder.append(previousComponent.toString());
+        previousComponent = new StringBuilder();
+        lastAdded = true;
 
-    format = format.replace("<message>", coloredMessage);
+        componentBuilder.append(names.getDecoratedNameComponent(p, player.getParty()));
 
-    TextComponent.Builder builder =
-        TextComponent.builder()
-            .append(TextComponent.of("Kills: " + player.getStats().getKills(), TextColor.GREEN))
-            .append(TextComponent.of(" | ", TextColor.GRAY))
-            .append(TextComponent.of("Deaths: " + player.getStats().getDeaths(), TextColor.RED))
-            .append(TextComponent.newline())
-            .append(TextComponent.of("Wins: " + player.getStats().getWins(), TextColor.GREEN))
-            .append(TextComponent.of(" | ", TextColor.GRAY))
-            .append(TextComponent.of("Losses: " + player.getStats().getLosses(), TextColor.RED))
-            .append(TextComponent.newline())
-            .append(TextComponent.of("Coins: " + player.getCoins().getCoins(), TextColor.YELLOW))
-            .append(TextComponent.newline())
-            .append(TextComponent.of("Elo: " + player.getStats().getElo(), TextColor.DARK_AQUA));
-
-    PlayerData data = player.getPlayerData();
-    JSONObject json = data.getData();
-    builder.append(TextComponent.newline());
-    builder.append(TextComponent.of("Tags: ", TextColor.DARK_PURPLE));
-    if (json.has("tags")) {
-      int i = 1;
-      JSONArray array = json.getJSONArray("tags");
-      for (Object o : array) {
-        String tag = (String) o;
-        builder.append(TextComponent.of(tag, TextColor.LIGHT_PURPLE));
-        if (i++ != array.length()) {
-          builder.append(TextComponent.of(" | ", TextColor.GRAY));
-        }
+        format = format.substring(j + "<player>".length());
+        messageIndex = format.indexOf("<message>");
+        playerIndex = format.indexOf("<player>");
+        j = -1;
+        continue;
       }
+      if (j == messageIndex) {
+        componentBuilder.append(previousComponent.toString());
+        previousComponent = new StringBuilder();
+        lastAdded = true;
+
+        StringBuilder coloredMessage = new StringBuilder();
+        for (int i = 0; i < message.length(); i++)
+          coloredMessage.append(color).append(message.charAt(i));
+
+        componentBuilder.append(TextComponent.of(coloredMessage.toString()));
+
+        format = format.substring(j + "<message>".length());
+        messageIndex = format.indexOf("<message>");
+        playerIndex = format.indexOf("<player>");
+        j = -1;
+        continue;
+      }
+      previousComponent.append(format.charAt(j));
+      lastAdded = false;
     }
 
-    TextComponent hover = builder.build();
+    if (!lastAdded) {
+      componentBuilder.append(previousComponent.toString());
+    }
 
-    return TextComponent.of(format)
-        .hoverEvent(HoverEvent.showText(hover))
-        .clickEvent(ClickEvent.suggestCommand("/msg " + player.getNameLegacy()));
+    return componentBuilder
+        .clickEvent(ClickEvent.suggestCommand("/msg " + player.getNameLegacy()))
+        .build();
   }
 
   private final List<String> servers = new ArrayList<>();

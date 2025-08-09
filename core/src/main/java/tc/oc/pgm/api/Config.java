@@ -295,6 +295,13 @@ public interface Config {
   int getGriefScore();
 
   /**
+   * Gets whether the AFK module should be enabled.
+   *
+   * @return
+   */
+  boolean isAfkModuleEnabled();
+
+  /**
    * Gets a group of players, used for prefixes and player sorting.
    *
    * @return A list of groups.

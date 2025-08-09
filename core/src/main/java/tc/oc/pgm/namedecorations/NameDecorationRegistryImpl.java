@@ -4,16 +4,19 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
+import net.kyori.text.event.HoverEvent;
 import net.kyori.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.json.JSONObject;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.event.NameDecorationChangeEvent;
 import tc.oc.pgm.api.party.Party;
 import tc.oc.pgm.api.player.MatchPlayer;
+import tc.oc.pgm.api.player.PlayerData;
 import tc.oc.pgm.events.PlayerJoinMatchEvent;
 import tc.oc.pgm.events.PlayerPartyChangeEvent;
 import tc.oc.pgm.util.text.TextFormatter;
@@ -50,7 +53,7 @@ public class NameDecorationRegistryImpl implements NameDecorationRegistry, Liste
 
   @Override
   public String getDecoratedName(Player player, Party party) {
-    MatchPlayer matchPlayer = getPlayer(player);
+    MatchPlayer matchPlayer = getPlayer(player, party);
     String name = matchPlayer == null ? player.getName() : matchPlayer.getNameLegacy();
     return getPrefix(player.getUniqueId())
         + (party == null ? ChatColor.RESET : party.getColor())
@@ -61,7 +64,7 @@ public class NameDecorationRegistryImpl implements NameDecorationRegistry, Liste
 
   @Override
   public String getDecoratedNameWithoutFlair(Player player, Party party) {
-    MatchPlayer matchPlayer = getPlayer(player);
+    MatchPlayer matchPlayer = getPlayer(player, party);
     String name = matchPlayer == null ? player.getName() : matchPlayer.getNameLegacy();
     return (party == null ? ChatColor.RESET : party.getColor()) + name + ChatColor.WHITE;
   }
@@ -78,12 +81,59 @@ public class NameDecorationRegistryImpl implements NameDecorationRegistry, Liste
 
   @Override
   public Component getDecoratedNameComponent(Player player, Party party) {
-    MatchPlayer matchPlayer = getPlayer(player);
-    String name = matchPlayer == null ? player.getName() : matchPlayer.getNameLegacy();
+    MatchPlayer matchPlayer = getPlayer(player, party);
+    if (matchPlayer != null) {
+      return getDecoratedNameComponent(matchPlayer);
+    }
+
+    String name = player.getName();
+    TextComponent nameComponent =
+        TextComponent.of(
+            name, party == null ? TextColor.WHITE : TextFormatter.convert(party.getColor()));
     return TextComponent.builder()
         .append(getPrefixComponent(player.getUniqueId()))
-        .append(name, party == null ? TextColor.WHITE : TextFormatter.convert(party.getColor()))
+        .append(nameComponent)
         .append(getSuffixComponent(player.getUniqueId()))
+        .build();
+  }
+
+  @Override
+  public Component getDecoratedNameComponent(MatchPlayer matchPlayer) {
+    Party party = matchPlayer.getParty();
+    TextComponent nameComponent =
+        TextComponent.of(
+            matchPlayer.getNameLegacy(),
+            party == null ? TextColor.WHITE : TextFormatter.convert(party.getColor()));
+    TextComponent.Builder builder =
+        TextComponent.builder()
+            .append(
+                TextComponent.of("Kills: " + matchPlayer.getStats().getKills(), TextColor.GREEN))
+            .append(TextComponent.of(" | ", TextColor.GRAY))
+            .append(
+                TextComponent.of("Deaths: " + matchPlayer.getStats().getDeaths(), TextColor.RED))
+            .append(TextComponent.newline())
+            .append(TextComponent.of("Wins: " + matchPlayer.getStats().getWins(), TextColor.GREEN))
+            .append(TextComponent.of(" | ", TextColor.GRAY))
+            .append(
+                TextComponent.of("Losses: " + matchPlayer.getStats().getLosses(), TextColor.RED))
+            .append(TextComponent.newline())
+            .append(
+                TextComponent.of("Coins: " + matchPlayer.getCoins().getCoins(), TextColor.YELLOW))
+            .append(TextComponent.newline())
+            .append(
+                TextComponent.of("Elo: " + matchPlayer.getStats().getElo(), TextColor.DARK_AQUA));
+
+    PlayerData data = matchPlayer.getPlayerData();
+    JSONObject json = data.getData();
+    builder.append(TextComponent.newline());
+    builder.append(TextComponent.of("Tags: ", TextColor.DARK_PURPLE));
+    builder.append(
+        TextComponent.of(
+            json.has("tags") ? json.getJSONArray("tags").join(" | ") : "", TextColor.LIGHT_PURPLE));
+    return TextComponent.builder()
+        .append(getPrefixComponent(matchPlayer.getId()))
+        .append(nameComponent.hoverEvent(HoverEvent.showText(builder.build())))
+        .append(getSuffixComponent(matchPlayer.getId()))
         .build();
   }
 
@@ -109,6 +159,11 @@ public class NameDecorationRegistryImpl implements NameDecorationRegistry, Liste
 
   private MatchPlayer getPlayer(Player player) {
     return PGM.get().getMatchManager().getPlayer(player);
+  }
+
+  private MatchPlayer getPlayer(Player player, Party party) {
+    MatchPlayer p = party == null ? null : party.getPlayer(player.getUniqueId());
+    return p != null ? p : getPlayer(player);
   }
 
   @Override

@@ -1,5 +1,7 @@
 package tc.oc.pgm.modules;
 
+import static tc.oc.pgm.util.text.TextParser.parseComponentLegacy;
+
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.util.ArrayList;
@@ -260,7 +262,7 @@ public class SuffixMatchModule implements MatchModule, Listener {
       if (data.getData().has("suffixes")) array = data.getData().getJSONArray("suffixes");
       else array = new JSONArray();
       List<Suffix> suffixes =
-          array.length() > 0
+          !array.isEmpty()
               ? ALL_SUFFIXES.stream()
                   .filter(
                       suffix -> {
@@ -675,11 +677,13 @@ public class SuffixMatchModule implements MatchModule, Listener {
       private final String suffix;
       private final TextColor color;
       private final Suffix suff;
+      private final String displayName;
 
       public SuffixFlair(String suffix, TextColor color, Suffix suff) {
         this.suffix = suffix;
         this.color = color;
         this.suff = suff;
+        displayName = parseComponentLegacy("&eFrom the coins shop");
       }
 
       @Override
@@ -701,7 +705,7 @@ public class SuffixMatchModule implements MatchModule, Listener {
 
       @Override
       public String getDisplayName() {
-        return null;
+        return displayName;
       }
 
       @Override

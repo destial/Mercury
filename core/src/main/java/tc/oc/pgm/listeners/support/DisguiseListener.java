@@ -1,4 +1,4 @@
-package tc.oc.pgm.listeners;
+package tc.oc.pgm.listeners.support;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -64,7 +64,7 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>destiall</id>
+            <id>destiall-snap</id>
             <url>https://repo.destial.xyz/snapshots</url>
         </repository>
         <repository>

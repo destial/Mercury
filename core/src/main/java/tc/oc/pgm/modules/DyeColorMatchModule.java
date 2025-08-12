@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Dye;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
 import tc.oc.pgm.api.match.MatchScope;
@@ -29,16 +30,22 @@ public class DyeColorMatchModule implements MatchModule, Listener {
 
   public boolean isReplaceable(ItemStack item) {
     return item.getType().equals(Material.WOOL)
+        || item.getType().equals(Material.INK_SACK)
         || item.getType().equals(Material.STAINED_CLAY)
         || item.getType().equals(Material.STAINED_GLASS)
-        || item.getType().equals(Material.STAINED_GLASS_PANE);
+        || item.getType().equals(Material.STAINED_GLASS_PANE)
+        || item.getType().equals(Material.CARPET)
+        || item.getType().equals(Material.BANNER);
   }
 
   public void replaceColor(ItemStack item, MatchPlayer player) {
-    item.setDurability(getDye(player.getParty().getColor()).getWoolData());
-    // MaterialData data =
-    // item.getType().getNewData(getDye(player.getParty().getColor()).getData());
-    // item.setData(data);
+    DyeColor dyeColor = getDye(player.getParty().getColor());
+    if (item.getType() == Material.INK_SACK) {
+      item.setData(new Dye(dyeColor));
+      return;
+    }
+    item.setDurability(
+        item.getType() == Material.BANNER ? dyeColor.getDyeData() : dyeColor.getWoolData());
   }
 
   public DyeColor getDye(ChatColor color) {

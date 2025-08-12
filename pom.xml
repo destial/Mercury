@@ -65,7 +65,11 @@
         </repository>
         <repository>
             <id>destiall</id>
-            <url>https://repo.destial.xyz/repository/maven-snapshots</url>
+            <url>https://repo.destial.xyz/snapshots</url>
+        </repository>
+        <repository>
+            <id>destiall</id>
+            <url>https://repo.destial.xyz/releases</url>
         </repository>
         <repository>
             <id>lunarclient</id>

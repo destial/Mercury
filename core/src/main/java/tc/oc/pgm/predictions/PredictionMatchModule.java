@@ -43,6 +43,8 @@ public class PredictionMatchModule implements MatchModule, Listener {
   private static final int VOTE_SLOT = 3;
   private static final int TIMER = 5;
   public static final int DEFAULT_BET = 250;
+  public static final int WIN_MODIFIER = 2;
+  public static final int LOSE_MODIFIER = -5;
 
   private final Match match;
   private final Map<Competitor, Map<UUID, Integer>> predictions;
@@ -142,7 +144,7 @@ public class PredictionMatchModule implements MatchModule, Listener {
                       TextComponent.of(
                           username.getNameLegacy()
                               + " won the most with "
-                              + most.getValue() * 2
+                              + most.getValue() * WIN_MODIFIER
                               + " coins from prediction!",
                           TextColor.GOLD));
                 }
@@ -175,14 +177,15 @@ public class PredictionMatchModule implements MatchModule, Listener {
     viewer.sendMessage(
         LegacyFormatUtils.horizontalDivider(
             (win ? ChatColor.GREEN : ChatColor.RED).asBungee(), 100));
-    int amount = bet * 2;
+
     if (win) {
+      int amount = bet * WIN_MODIFIER;
       viewer.sendMessage(
           TextComponent.of(
               "You predicted correctly! You have gained " + amount + " coins!", TextColor.GREEN));
       viewer.getCoins().addCoins(amount);
     } else {
-      amount *= 2;
+      int amount = bet * LOSE_MODIFIER;
       viewer.sendMessage(
           TextComponent.of(
               "You predicted poorly! You have lost " + amount + " coins!", TextColor.RED));
@@ -240,8 +243,8 @@ public class PredictionMatchModule implements MatchModule, Listener {
 
     content
         .append(TextComponent.newline())
-        .append(TextComponent.of("Win Rate: x2", TextColor.GREEN))
-        .append(TextComponent.of("Lose Rate: x4", TextColor.RED));
+        .append(TextComponent.of("Win Rate: x" + WIN_MODIFIER, TextColor.GREEN))
+        .append(TextComponent.of("Lose Rate: x" + LOSE_MODIFIER, TextColor.RED));
 
     ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
     BookMeta meta = (BookMeta) is.getItemMeta();

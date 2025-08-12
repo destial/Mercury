@@ -66,6 +66,7 @@ import tc.oc.pgm.observers.ObserverToolsMatchModule;
 import tc.oc.pgm.picker.PickerMatchModule;
 import tc.oc.pgm.portals.PortalMatchModule;
 import tc.oc.pgm.portals.PortalModule;
+import tc.oc.pgm.predictions.PredictionMatchModule;
 import tc.oc.pgm.projectile.ProjectileMatchModule;
 import tc.oc.pgm.projectile.ProjectileModule;
 import tc.oc.pgm.proximity.ProximityAlarmMatchModule;
@@ -147,8 +148,9 @@ public interface Modules {
       register(MapListMatchModule.class, MapListMatchModule::new);
       register(CoinsMatchModule.class, CoinsMatchModule::new);
       register(SuffixMatchModule.class, SuffixMatchModule::new);
+
       // register(EloModule.class, EloMatchModule.class, new EloModule.Factory());
-      // register(PredictionMatchModule.class, PredictionMatchModule::new);
+      register(PredictionMatchModule.class, PredictionMatchModule::new);
     }
 
     // Modules that help older player versions

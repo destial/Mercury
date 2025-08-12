@@ -42,10 +42,10 @@
         <!-- <module>server</module> -->
     </modules>
     <repositories>
-        <repository>
+        <!-- <repository> Repository is down :(
             <id>ashcon.app</id>
             <url>https://repo.ashcon.app/content/repositories/snapshots</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>Scarsz-Nexus</id>
             <url>https://nexus.scarsz.me/content/groups/public/</url>
